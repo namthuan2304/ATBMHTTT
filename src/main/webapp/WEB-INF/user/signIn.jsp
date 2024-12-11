@@ -20,36 +20,31 @@
                 var email = $('#email').val();
                 var password = $('#password').val();
                 var rememberMe = $('#remember-me').is(':checked');
+
                 $.ajax({
                     type: 'POST',
+                    url: 'signin',
                     data: {
                         email: email,
                         password: password,
                         rememberMe: rememberMe
                     },
-                    url: 'signin',
                     success: function (result) {
                         try {
-                            var resp = grecaptcha.getResponse();
-                            if (resp.length === 0) {
+                            if (result.status === "error") {
+                                $('#errorLogin').html(result.message);
                                 $('#success').html("");
-                                $('#errorLogin').html("");
-                                $('#errorCaptcha').html("Please verify recaptcha!");
+                            } else if (result.status === "generateKey") {
+                                // Chuyển hướng đến generateKey
+                                window.location.href = context + "/user/generateKey";
+                            } else if (result.status === "success") {
+                                // Chuyển hướng đến trang được chỉ định
+                                window.location.href = context + "/" + result.redirect;
                             } else {
-                                if (result.status !== "success") {
-                                    if (result.error)
-                                    $('#errorLogin').html(result.error);
-                                    $('#success').html("");
-                                    $('#errorCaptcha').html("");
-                                } else {
-                                    if(result.role === "admin") {
-                                        window.location.href = context + "/admin/dashboard";
-                                    } else {
-                                        window.location.href = context + "/user/home";
-                                    }
-                                }
+                                console.error("Unexpected response: ", result);
                             }
                         } catch (e) {
+                            console.error("Error processing response: ", e);
                             $('#errorLogin').html("Error loading request, please try again!");
                         }
                     },
@@ -58,19 +53,24 @@
                     }
                 });
             });
-        });
-        var baseUri = "http://localhost:8080/user/signin?apis=";
-        document.addEventListener('DOMContentLoaded', function () {
-            var encodedUri = encodeURIComponent(baseUri + "Facebook");
-            var facebookUrl = "https://www.facebook.com/v19.0/dialog/oauth?fields=id,name,first_name,email,picture&client_id=834857594884300&redirect_uri=" + encodedUri;
-            var linkElement = document.getElementById('facebook-login-link');
-            linkElement.href = facebookUrl;
-        });
-        document.addEventListener('DOMContentLoaded', function () {
-            var encodedUri = encodeURIComponent(baseUri + "Twitter");
-            var twitterUrl = "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=ejk3azBSZE1pMkNzZi0xOGdfTmo6MTpjaQ&redirect_uri=" + encodedUri + "&scope=tweet.read%20users.read%20follows.read%20offline.access&state=state&code_challenge=challenge&code_challenge_method=plain";
-            var linkElement = document.getElementById('x-login-link');
-            linkElement.href = twitterUrl;
+
+            var baseUri = "http://localhost:8080/user/signin?apis=";
+
+            // Facebook login link
+            document.addEventListener('DOMContentLoaded', function () {
+                var encodedUri = encodeURIComponent(baseUri + "Facebook");
+                var facebookUrl = "https://www.facebook.com/v19.0/dialog/oauth?fields=id,name,first_name,email,picture&client_id=834857594884300&redirect_uri=" + encodedUri;
+                var linkElement = document.getElementById('facebook-login-link');
+                linkElement.href = facebookUrl;
+            });
+
+            // Twitter login link
+            document.addEventListener('DOMContentLoaded', function () {
+                var encodedUri = encodeURIComponent(baseUri + "Twitter");
+                var twitterUrl = "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=ejk3azBSZE1pMkNzZi0xOGdfTmo6MTpjaQ&redirect_uri=" + encodedUri + "&scope=tweet.read%20users.read%20follows.read%20offline.access&state=state&code_challenge=challenge&code_challenge_method=plain";
+                var linkElement = document.getElementById('x-login-link');
+                linkElement.href = twitterUrl;
+            });
         });
     </script>
 </head>
@@ -83,7 +83,6 @@
                 <h2>Đăng Nhập</h2>
                 <span style="color: #66b840;margin-bottom: 10px" id="success">${empty sessionScope.success?'': sessionScope.success}</span>
                 <span style="color: red;margin-bottom: 10px" id="errorLogin">${empty loginFail? '': loginFail}</span>
-                <span style="color: red;margin-bottom: 10px" id="errorCaptcha"></span>
                 <div class="input-group">
                     <input type="email" id="email" name="email" placeholder="Email" value="${empty email ? '' : email}" required>
                     <div id="email-error" style="color: red;"></div>
@@ -95,9 +94,6 @@
                 <div class="terms-checkbox">
                     <input type="checkbox" id="remember-me" name="remember-me" required>
                     <label for="remember-me">Remember me</label>
-                </div>
-                <div class="container-capcha" style="margin-bottom: 15px; translate: 80px">
-                    <div class="g-recaptcha" data-sitekey="6LccJf8pAAAAAKFsySRinmrgaKifye9ONkxLpWga"></div>
                 </div>
                 <button id="btnLogin" type="submit">Đăng Nhập</button>
                 <div class="forgot-password">
@@ -134,6 +130,5 @@
 </div>
 
 <script src="/assets/user/js/sign/scipts.js"></script>
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </body>
 </html>

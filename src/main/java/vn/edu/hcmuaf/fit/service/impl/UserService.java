@@ -443,6 +443,38 @@ public class UserService extends LogDAO<User> implements IUserService {
     }
 
     @Override
+    public boolean savePublicKey(User user, String publicKey, String ip, String address) {
+        try {
+            // Lưu trạng thái trước khi thực hiện cập nhật
+            user.setBeforeData("User with ID=" + user.getId() + " has no public key or existing key is being replaced.");
+
+            // Thực hiện lưu khóa công khai
+            boolean success = UserDAO.getInstance().savePublicKey(user.getId(), publicKey);
+
+            // Ghi nhận trạng thái sau khi thực hiện
+            if (success) {
+                user.setAfterData("Public key saved successfully for User ID=" + user.getId());
+            } else {
+                user.setAfterData("Failed to save public key for User ID=" + user.getId());
+            }
+
+            // Ghi log hoạt động
+            Level logLevel = success
+                    ? LevelDAO.getInstance().getLevel(1).get(0) // Level success
+                    : LevelDAO.getInstance().getLevel(2).get(0); // Level error
+            super.insert(user, logLevel, ip, address);
+
+            return success;
+        } catch (Exception e) {
+            // Xử lý ngoại lệ và ghi log lỗi
+            user.setAfterData("Error saving public key for User ID=" + user.getId() + ": " + e.getMessage());
+            super.insert(user, LevelDAO.getInstance().getLevel(2).get(0), ip, address);
+            return false;
+        }
+    }
+
+
+    @Override
     public boolean updateAvatar(User user, String ip, String address) {
         try {
             user.setBeforeData("Old avatar of ID=" + user.getId() + " is " + user.getAvatar());

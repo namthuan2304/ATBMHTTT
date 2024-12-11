@@ -36,11 +36,15 @@ public class Home extends HttpServlet {
             Integer flag = (Integer) session.getAttribute("flag");
             List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
             List<WishlistItem> wishlist = (List<WishlistItem>) session.getAttribute("wishlist");
-            if (flag == 0) {
+            if (flag == null || flag == 0) {
                 cart = CartService.getInstance().getCartByUser(user);
                 wishlist = WishlistService.getInstance().getWishlistByUser(user);
                 if(wishlist==null) wishlist = new ArrayList<>();
-                flag++;
+               if(flag == null){
+                   flag = 1;
+               } else {
+                   flag++;
+               }
                 session.setAttribute("flag", flag);
                 session.setAttribute("cart", cart);
                 session.setAttribute("total", cart.size());
