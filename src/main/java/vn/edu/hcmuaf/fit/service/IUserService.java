@@ -41,4 +41,6 @@ public interface IUserService {
     User loginByAPIS(User user, String ip, String address);
 
     boolean updateAvatar(User user, String ip, String address);
+
+    boolean savePublicKey(User user, String publicKey, String ip, String address);
 }

@@ -66,8 +66,8 @@ public class SignIn extends HttpServlet {
             if ((password == null) || (password.equals(""))) {
                 ok = false;
             }
-            if(!ok) {
-                out.write("{\"error\":\"Please fill in all information completely\"}");
+            if (!ok) {
+                out.write("{\"status\": \"error\", \"message\": \"Please fill in all information completely\"}");
             } else {
                 User u = new User();
                 u.setEmail(email);
@@ -75,22 +75,33 @@ public class SignIn extends HttpServlet {
 
                 User user = UserService.getInstance().signIn(u, ip, "/user/signin");
                 User userMail = UserService.getInstance().chkUsrByNameOrEmail("", email);
+
                 if (user == null) {
                     if (userMail != null) {
-                        if(userMail.getVerified() && userMail.getLoginTimes() < 5) {
-                            int times = userMail.getLoginTimes()+1;
+                        if (userMail.getVerified() && userMail.getLoginTimes() < 5) {
+                            int times = userMail.getLoginTimes() + 1;
                             UserService.getInstance().updateLoginFail(userMail, times, ip, "/user/signin");
-                            if(times < 5) out.println("{\"error\":\"Wrong password. You have "+ (5 - times) +" times to login!\"}");
-                            else out.write("{\"error\":\"Login failed. We have locked the email " + email + "!\"}");
+                            if (times < 5) {
+                                out.write("{\"status\": \"error\", \"message\": \"Wrong password. You have " + (5 - times) + " times to login!\"}");
+                            } else {
+                                out.write("{\"status\": \"error\", \"message\": \"Login failed. We have locked the email " + email + "!\"}");
+                            }
                         } else {
-                            if(userMail.getLoginTimes() >= 5) out.write("{\"error\":\"Login failed. We have locked the email " + email + "!\"}");
-                            else out.write("{\"error\":\"Account has not been activated to login!\"}");
+                            if (userMail.getLoginTimes() >= 5) {
+                                out.write("{\"status\": \"error\", \"message\": \"Login failed. We have locked the email " + email + "!\"}");
+                            } else {
+                                out.write("{\"status\": \"error\", \"message\": \"Account has not been activated to login!\"}");
+                            }
                         }
                     } else {
-                        out.write("{\"error\":\"Wrong email, please try again!\"}");
+                        out.write("{\"status\": \"error\", \"message\": \"Wrong email, please try again!\"}");
                     }
                 } else {
-                    if (user.getRole().getId() == 1 && user.getLoginTimes() < 5) {
+                    if (user.getPublicKey() == null || user.getPublicKey().isEmpty()) {
+                        HttpSession session = request.getSession(true);
+                        session.setAttribute("auth", user);
+                        out.write("{\"status\": \"generateKey\"}");
+                    } else if (user.getRole().getId() == 1 && user.getLoginTimes() < 5) {
                         UserService.getInstance().resetLoginTimes(user, "", "", ip, "/user/signin");
                         HttpSession session = request.getSession(true);
                         session.setAttribute("auth", user);
@@ -98,33 +109,32 @@ public class SignIn extends HttpServlet {
                         Cookie uc = new Cookie("userC", email);
                         Cookie pc = new Cookie("passC", password);
                         uc.setMaxAge(30 * 24 * 60 * 60);
-                        if (remember != null) {
-                            if(Boolean.parseBoolean(remember)) {
-                                pc.setMaxAge(30 * 24 * 60 * 60);
-                            } else {
-                                pc.setMaxAge(0);
-                            }
+                        if (remember != null && Boolean.parseBoolean(remember)) {
+                            pc.setMaxAge(30 * 24 * 60 * 60);
                         } else {
                             pc.setMaxAge(0);
                         }
                         response.addCookie(uc);
                         response.addCookie(pc);
-                        out.write("{ \"status\": \"success\"}");
-
+                        out.write("{\"status\": \"success\", \"redirect\": \"user/home\"}");
                     } else if (user.getRole().getId() == 2 && user.getLoginTimes() < 5) {
                         UserService.getInstance().resetLoginTimes(user, "", "", ip, "/user/signin");
                         HttpSession session = request.getSession();
                         session.setAttribute("adminAuth", user);
-                        out.write("{ \"status\": \"success\", \"role\": \"admin\"}");
+                        out.write("{\"status\": \"success\", \"redirect\": \"admin/dashboard\"}");
                     } else {
-                        if(user.getLoginTimes() == 5) out.write("{\"error\":\"Login failed. We have locked the email " + email + "!\"}");
-                        else if(user.getRole().getId() != 1) out.write("{\"error\":\"You do not have access rights\"}");
+                        if (user.getLoginTimes() == 5) {
+                            out.write("{\"status\": \"error\", \"message\": \"Login failed. We have locked the email " + email + "!\"}");
+                        } else if (user.getRole().getId() != 1) {
+                            out.write("{\"status\": \"error\", \"message\": \"You do not have access rights\"}");
+                        }
                     }
                 }
             }
             out.close();
             return;
         }
+
         try {
             User userToken = null;
             switch (apis) {
@@ -149,6 +159,7 @@ public class SignIn extends HttpServlet {
             throw new RuntimeException(e);
         }
     }
+
 
     private void loginByAPIS(HttpServletRequest request, HttpServletResponse response, User userToken, String ip, String apis) throws ServletException, IOException {
         User user = UserService.getInstance().loginByAPIS(userToken, ip, "/user/loginByAPIS");

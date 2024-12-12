@@ -41,4 +41,6 @@ public interface IUserDAO extends GenericDAO<User> {
     boolean resetLoginTimes(String email);
 
     boolean updateAvatar(Integer id, String avatar);
+
+    boolean savePublicKey(Integer userId, String publicKey);
 }

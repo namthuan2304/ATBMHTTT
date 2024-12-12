@@ -179,6 +179,21 @@ public class UserDAO extends AbsDAO<User> implements IUserDAO {
     }
 
 
+    /**
+     * Saves a public key into the database for a specified user.
+     *
+     * @param userId      the ID of the user associated with the public key
+     * @param publicKey   the public key to be saved
+     * @return true if the key was successfully saved, false otherwise
+     */
+    @Override
+    public boolean savePublicKey(Integer userId, String publicKey) {
+        // SQL query to update the public_key and keyCreatedDate for the user in the 'users' table
+        String sql = "UPDATE users SET public_key = ?, keyCreatedDate = CURRENT_TIMESTAMP WHERE id = ?";
+
+        // Execute the update and return the result
+        return update(sql, publicKey, userId);
+}
 
 
 
