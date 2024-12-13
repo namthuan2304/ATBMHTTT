@@ -155,4 +155,13 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
         String sql = "SELECT * FROM orders WHERE id = ? AND date_payment IS NOT NULL";
         return query(sql, Order.class, orderId);
     }
+
+    @Override
+    public boolean saveSignature(int order_id, String signature) {
+        // SQL query to update the public_key and keyCreatedDate for the user in the 'users' table
+        String sql = "UPDATE orders SET signature = ? WHERE id = ?";
+        // Execute the update and return the result
+        return update(sql, signature, order_id);
+    }
+
 }

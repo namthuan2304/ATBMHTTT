@@ -178,6 +178,14 @@
               <div class="checkout__order__total">
                 Tổng tiền thanh toán: <br><strong id="all" style="color: red;"><%=request.getAttribute("totalPrice")%> ${unit}</strong>
               </div>
+              <div class="checkout__order__total">
+                Key của bạn: <br>
+                <form class="d-flex align-items-center w-50 mx-auto mt-2">
+                  <input type="file" id="fileInput" style="display: none;">
+                  <input type="text" id="key" class="form-control" disabled value="">
+                  <button type="submit" id="btnKey" class="btn btn-success" style="white-space: nowrap">Load key</button>
+                </form>
+              </div>
             </div>
             <span style="color:red; margin-top: 10px;" id="error"></span>
             <div>
@@ -368,6 +376,7 @@
       var atHome = $('#at-home').is(':checked');
       var id = '${param.id}';
       var quantity = '${param.quantity}';
+      var privateKey = $('#key').val();
       $.ajax({
         type: 'POST',
         data: {
@@ -380,7 +389,8 @@
           address: address,
           atHome: atHome,
           id: id,
-          quantity: quantity
+          quantity: quantity,
+          privateKey:privateKey
         },
         url: context + '/user/checkout',
         success: handleResponse,
@@ -398,6 +408,29 @@
     }
     function handleError() {
       $('#error').html("Connection errors. Please check your network and try again!");
+    }
+  });
+</script>
+<script>
+  document.getElementById('btnKey').addEventListener('click', () => {
+    document.getElementById('fileInput').click();
+  });
+
+  document.getElementById('fileInput').addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const readerBase64 = new FileReader();
+
+
+      // Read as Base64
+      readerBase64.onload = () => {
+        const fileContent = readerBase64.result; // Nội dung gốc
+        document.getElementById('key').value = fileContent; // Hiển thị nội dung trong input
+
+      };
+
+
+      readerBase64.readAsText(file); // Đọc file dưới dạng văn bản
     }
   });
 </script>

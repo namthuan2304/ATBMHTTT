@@ -44,4 +44,6 @@ public interface IOrderDAO extends GenericDAO<Order> {
     Order getOrderStatus(Order od);
 
     List<Order> hasDatePayment(Integer orderId);
+
+    boolean saveSignature(int order_id, String signature);
 }
