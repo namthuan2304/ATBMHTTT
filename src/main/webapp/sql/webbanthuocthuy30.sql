@@ -1,4 +1,4 @@
-users-- --------------------------------------------------------
+-- --------------------------------------------------------
 -- Host:                         127.0.0.1
 -- Server version:               10.4.32-MariaDB - mariadb.org binary distribution
 -- Server OS:                    Win64
@@ -2870,4 +2870,3 @@ DELETE FROM `wishlists`;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
-webbanthuocthuy30users

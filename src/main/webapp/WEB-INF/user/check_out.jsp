@@ -428,6 +428,15 @@
       readerBase64.readAsText(file); // Đọc file dưới dạng văn bản
     }
   });
+
+  document.getElementById("btnKey").addEventListener("click", function(event) {
+    event.preventDefault();  // Ngừng hành động submit mặc định của form
+    // Xử lý tiếp theo (ví dụ: thay đổi giá trị của trường input)
+    console.log("Button clicked, form submit prevented");
+    // Bạn có thể thêm logic xử lý thêm ở đây, ví dụ:
+    document.getElementById("key").value = "New Key";  // Cập nhật giá trị trường input
+  });
+
 </script>
 </body>
 </html>

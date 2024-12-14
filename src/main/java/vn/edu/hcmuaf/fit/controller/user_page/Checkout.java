@@ -12,7 +12,6 @@ import vn.edu.hcmuaf.fit.service.impl.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -30,6 +29,7 @@ public class Checkout extends HttpServlet {
         HttpSession session = request.getSession(true);
         User user = (User) session.getAttribute("auth");
         if (user == null) request.getRequestDispatcher("/WEB-INF/user/signIn.jsp").forward(request, response);
+
         else {
             String ip = request.getHeader("X-FORWARDED-FOR");
             if (ip == null) ip = request.getRemoteAddr();
@@ -38,8 +38,8 @@ public class Checkout extends HttpServlet {
             String id = request.getParameter("id");
             Discount discount = (Discount) session.getAttribute("discount");
 
-            if (id == null || id.isEmpty()) {
-                if (!cart.isEmpty()) {
+            if (id == null || id.isEmpty()) { // id ko ton tai (thanh toan tu gio hang)
+                if (!cart.isEmpty()) {        // cart co san pham (khong rong)
                     double re = 0.0;
                     for (CartItem i : cart) {
                         Map<Product, List<String>> products = ProductService.getInstance().getProductByIdWithSupplierInfo(new Product(i.getProduct().getId()), ip, "/user/cart");
@@ -58,7 +58,8 @@ public class Checkout extends HttpServlet {
                     request.setAttribute("priceShipment", priceShipment);
                     request.getRequestDispatcher("/WEB-INF/user/check_out.jsp").forward(request, response);
                 } else {
-                    request.getRequestDispatcher("/WEB-INF/user/cart.jsp").forward(request, response);
+//                    request.getRequestDispatcher("/WEB-INF/user/cart.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/user/check_out.jsp").forward(request, response);
                 }
             } else {
                 Product p = new Product(Integer.parseInt(id));

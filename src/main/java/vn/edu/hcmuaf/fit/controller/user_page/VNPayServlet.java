@@ -147,7 +147,6 @@ public class VNPayServlet extends HttpServlet {
             if (ip == null) ip = request.getRemoteAddr();
             String phone = request.getParameter("txt_inv_mobile");
             String atHome = request.getParameter("atHome")==null? "" : request.getParameter("atHome");
-            System.out.println("vo day khong: " + atHome);
             int id = request.getParameter("id")==null||request.getParameter("id").isEmpty()? 0 : Integer.parseInt(request.getParameter("id"));
             int quantity = request.getParameter("quantity")==null||request.getParameter("quantity").isEmpty() ? 0 : Integer.parseInt(request.getParameter("quantity"));
 
