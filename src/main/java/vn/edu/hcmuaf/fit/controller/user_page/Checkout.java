@@ -269,58 +269,47 @@ public class Checkout extends HttpServlet {
                         session.removeAttribute("discount");
                         session.removeAttribute("retain");
                         session.removeAttribute("result");
-                        out.write("{ \"status\": \"success\"}");
+//                        out.write("{ \"status\": \"success\"}");
                     }
                     String privateKey = request.getParameter("privateKey");
-                    System.out.println(privateKey);
-
                     if (privateKey != null && !privateKey.isEmpty()) {
                         try {
-                            JSONObject orderJson = new JSONObject(order);
-
+                            Order orderNearest = OrderService.getInstance().loadOrderNear(1).keySet().iterator().next();
+                            JSONObject orderJson = new JSONObject(orderNearest);
                             Signature signature = new Signature();
                             Hash hash = new Hash();
-
-                            System.out.println("Creating hash...");
-
                             // Convert Base64 to PrivateKey
                             try {
                                 signature.privateKey = signature.convertBase64ToPrivateKey(privateKey);
                                 System.out.println(Base64.getEncoder().encodeToString(signature.privateKey.getEncoded()));
-                                System.out.println("Private key converted.");
-
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                out.write("{ \"status\": \"Invalid private key!\" }");
+                                out.write("{ \"status\": \"Error\"}");
                                 return;
                             }
 
                             // Hash and sign order
                             try {
                                 String hashOrder = hash.hash(orderJson.toString());
-                                System.out.println("Order hashed.");
-
                                 String sign = signature.encryptBase64(hashOrder);
-                                System.out.println("Signature created.");
-
-                                boolean rs = OrderService.getInstance().saveSignature(order, sign, ip, "/user/checkout");
+                                boolean rs = OrderService.getInstance().saveSignature(orderNearest, sign, ip, "/user/checkout");
                                 if (rs) {
-                                    System.out.println("luu chu ky thanh cong");
-                                    out.write("{ \"status\": \"Save to database successful!\" }");
+                                    out.write("{ \"status\": \"success\"}");
                                 } else {
-                                    out.write("{ \"status\": \"Save to database failed!\" }");
+                                    out.write("{ \"status\": \"Error\"}");
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                out.write("{ \"status\": \"Error during hashing or signing!\" }");
+                                out.write("{ \"status\": \"Error\"}");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-                            out.write("{ \"status\": \"Invalid order data!\" }");
+                            out.write("{ \"status\": \"Error\"}");
                         }
                     } else {
-                        out.write("{ \"status\": \"Private key is missing or empty!\" }");
+                        out.write("{ \"status\": \"Error\"}");
                     }
+
                 } else {
                     out.write("{\"status\": \"failed\"}");
                 }

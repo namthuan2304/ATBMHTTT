@@ -420,16 +420,11 @@
     const file = event.target.files[0];
     if (file) {
       const readerBase64 = new FileReader();
-
-
       // Read as Base64
       readerBase64.onload = () => {
         const fileContent = readerBase64.result; // Nội dung gốc
         document.getElementById('key').value = fileContent; // Hiển thị nội dung trong input
-
       };
-
-
       readerBase64.readAsText(file); // Đọc file dưới dạng văn bản
     }
   });
