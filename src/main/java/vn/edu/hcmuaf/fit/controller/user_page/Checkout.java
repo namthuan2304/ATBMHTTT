@@ -183,6 +183,7 @@ public class Checkout extends HttpServlet {
 
             String address = request.getParameter("address");
             boolean atHome = request.getParameter("atHome") == null ? false : Boolean.parseBoolean(request.getParameter("atHome"));
+            String privateKey = request.getParameter("privateKey");
 
             boolean ok = true;
             if ((fullName == null) || (fullName.equals(""))) {
@@ -206,6 +207,9 @@ public class Checkout extends HttpServlet {
             if ((address == null) || (address.equals(""))) {
                 ok = false;
             }
+            if ((privateKey == null) || (privateKey.equals(""))) {
+                ok = false;
+            }
 
             if (!ok) {
                 out.write("{\"error\":\"Please fill in all information completely\"}");
@@ -213,6 +217,7 @@ public class Checkout extends HttpServlet {
                 if (user != null) {
                     DeliveryAddress dev = new DeliveryAddress(user, fullName, phone, tinh, quan, phuong, address, atHome, true);
                     DeliveryAddress delivery = DeliveryService.getInstance().addDeliveryAddress(dev, ip, "/user/checkout");
+                    // insert delivery thanh cong
 
                     Order order = new Order();
                     order.setUser(user);
@@ -221,6 +226,7 @@ public class Checkout extends HttpServlet {
                     ShippingType shippingType = new ShippingType();
                     shippingType.setId(1);
                     order.setType(shippingType);
+
                     if (discount != null) order.setDiscount(discount);
                     else order.setDiscount(new Discount());
 
@@ -272,7 +278,7 @@ public class Checkout extends HttpServlet {
                         session.removeAttribute("result");
 //                        out.write("{ \"status\": \"success\"}");
                     }
-                    String privateKey = request.getParameter("privateKey");
+
                     if (privateKey != null && !privateKey.isEmpty()) {
                         try {
                             Order orderNearest = OrderService.getInstance().loadOrderNear(1).keySet().iterator().next();

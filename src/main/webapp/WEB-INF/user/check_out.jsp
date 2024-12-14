@@ -291,11 +291,11 @@
 <script>
   function handleVnpayClick() {
     const fullName = document.getElementById("full_name").value;
-    console.log(fullName)
     const phone = document.getElementById("phone").value;
     const address = document.getElementById("address").value;
     const email = document.getElementById("email").value;
     const atHome = document.getElementById("at-home").value;
+    const key = document.getElementById("key").value;
     const id = '${param.id}';
     const quantity = '${param.quantity}';
 
@@ -312,7 +312,7 @@
     var quanText = quanId === "0" ? "" : $("#quan option:selected").data('full-name');
     var phuongText = phuongId === "0" ? "" : $("#phuong option:selected").data('full-name');
 
-    const fields = [fullName, phone, address, email, amount, tinhText, quanText, phuongText];
+    const fields = [fullName, phone, address, email, amount, tinhText, quanText, phuongText, key];
     const emptyField = fields.some(field => field === "" || field === undefined || field === null);
     if (emptyField || tinhText === "0" || quanText === "0" || phuongText === "0") {
       document.getElementById('error').innerHTML = "Please fill in all information completely";
@@ -374,9 +374,10 @@
       var fullNamePhuong = $("#phuong option:selected").data('full-name');
       var email = $('#email').val();
       var atHome = $('#at-home').is(':checked');
+      var privateKey = $('#key').val();
       var id = '${param.id}';
       var quantity = '${param.quantity}';
-      var privateKey = $('#key').val();
+
       $.ajax({
         type: 'POST',
         data: {
@@ -390,7 +391,7 @@
           atHome: atHome,
           id: id,
           quantity: quantity,
-          privateKey:privateKey
+          privateKey: privateKey
         },
         url: context + '/user/checkout',
         success: handleResponse,
@@ -430,11 +431,7 @@
   });
 
   document.getElementById("btnKey").addEventListener("click", function(event) {
-    event.preventDefault();  // Ngừng hành động submit mặc định của form
-    // Xử lý tiếp theo (ví dụ: thay đổi giá trị của trường input)
-    console.log("Button clicked, form submit prevented");
-    // Bạn có thể thêm logic xử lý thêm ở đây, ví dụ:
-    document.getElementById("key").value = "New Key";  // Cập nhật giá trị trường input
+    event.preventDefault();
   });
 
 </script>
