@@ -8,11 +8,13 @@ import vn.edu.hcmuaf.fit.model.User;
 import vn.edu.hcmuaf.fit.service.impl.RSAKeyGeneratorImpl;
 import vn.edu.hcmuaf.fit.service.impl.UserService;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 @WebServlet("/user/generateKey")
 public class GenerateKey extends HttpServlet {
@@ -75,7 +77,7 @@ public class GenerateKey extends HttpServlet {
 
             String download = request.getParameter("download");
             if ("true".equalsIgnoreCase(download)) {
-                sendPrivateKeyAsFile(response, privateKeyBase64, user.getEmail());
+                sendPrivateKeyAndToolsAsZip(response, privateKeyBase64, user.getEmail());
                 return;
             }
 
@@ -94,17 +96,50 @@ public class GenerateKey extends HttpServlet {
     }
 
 
-    private void sendPrivateKeyAsFile(HttpServletResponse response, String privateKey, String userEmail) throws IOException {
-        String fileName = userEmail + "_private_key.pem";
+    public void sendPrivateKeyAndToolsAsZip(HttpServletResponse response, String privateKey, String userEmail) throws IOException {
+        // Tên file zip sẽ gửi cho người dùng
+        String zipFileName = userEmail + "_tools_and_private_key.zip";
+
+        // Chuyển privateKey thành byte array
         byte[] privateKeyBytes = privateKey.getBytes("UTF-8");
 
-        response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-        response.setContentLength(privateKeyBytes.length);
+        // Cấu hình phản hồi HTTP
+        response.setContentType("application/zip");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + zipFileName + "\"");
 
-        try (ServletOutputStream outputStream = response.getOutputStream()) {
-            outputStream.write(privateKeyBytes);
-            outputStream.flush();
+        // Mở file ToolKySo.zip từ thư mục resources/tools
+        try (ServletOutputStream outputStream = response.getOutputStream();
+             ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(outputStream))) {
+
+            // Sử dụng ClassLoader để lấy file zip từ resources
+            InputStream zipFileInputStream = getClass().getClassLoader().getResourceAsStream("tools/ToolKySo.zip");
+
+            if (zipFileInputStream == null) {
+                throw new FileNotFoundException("Không tìm thấy file ToolKySo.zip trong thư mục resources/tools/");
+            }
+
+            // Đọc file zip từ InputStream và thêm vào output stream
+            try (ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(zipFileInputStream))) {
+                ZipEntry entry;
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                    zipOutputStream.putNextEntry(entry);
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = zipInputStream.read(buffer)) > 0) {
+                        zipOutputStream.write(buffer, 0, length);
+                    }
+                    zipOutputStream.closeEntry();
+                }
+            }
+
+            // Thêm file private_key.pem vào zip
+            ZipEntry privateKeyEntry = new ZipEntry("private_key.pem");
+            zipOutputStream.putNextEntry(privateKeyEntry);
+            zipOutputStream.write(privateKeyBytes);
+            zipOutputStream.closeEntry();
+
+            // Flush và đóng zipOutputStream
+            zipOutputStream.flush();
         }
     }
 

@@ -63,13 +63,18 @@
                     <li class="menu-item">
                         <a href="${request.servletContext.contextPath}/user/feedback"><span class="nav-link-text" style="white-space: nowrap">Liên hệ</span></a>
                     </li>
+                    <li class="menu-item">
+                        <a href="${request.servletContext.contextPath}/user/downloadToolKySo">
+                            Tải Tool Ký Số
+                        </a>
+                    </li>
+
                 </ul>
             </div>
         </div>
         <div class="header-right">
             <form role="search" class="searchform" data-thumbnail="1" data-price="1" data-post_type="product" data-count="20" data-sku="0" data-symbols_count="3">
-                <input type="text" id="searchTerm" name="searchTerm" class="s" placeholder="Tìm kiếm sản phẩm" value="" aria-label="Search"
-                       title="Search for products" required="" oninput="searchByName(this.value, null, null, null, null)" />
+                <input type="text" id="searchTerm" name="searchTerm" class="s" placeholder="Tìm kiếm sản phẩm" value="" aria-label="Search" title="Search for products" required="" oninput="searchByName(this.value, null, null, null, null)" />
                 <button type="submit" class="searchsubmit"><i class="fa-solid fa-magnifying-glass"></i></button>
             </form>
             <div class="action">
@@ -79,6 +84,7 @@
                         <i class="fa-solid fa-cart-shopping material-icons"></i>
                     </a>
                 </div>
+
                 <c:choose>
                     <c:when test="${empty sessionScope.auth}">
                         <a class="sign-in" href="${request.servletContext.contextPath}/user/signin">Đăng nhập</a>
@@ -89,8 +95,7 @@
                             <div class="user-dropdown-content" id="user-dropdown-content">
                                 <ul class="user-menu">
                                     <li class="user-menu-item">
-                                        <a href="${request.servletContext.contextPath}/user/updateinfouser"><span class="nav-link-text">Quản lý thông tin cá
-                                                nhân</span></a>
+                                        <a href="${request.servletContext.contextPath}/user/updateinfouser"><span class="nav-link-text">Quản lý thông tin cá nhân</span></a>
                                     </li>
                                     <li class="user-menu-item">
                                         <a href="${request.servletContext.contextPath}/user/signout"><span class="nav-link-text">Đăng xuất</span></a>
