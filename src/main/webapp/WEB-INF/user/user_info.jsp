@@ -68,8 +68,13 @@
                     <li class="nav-item">
                         <a href="" data-target="#favourite" data-toggle="tab" class="nav-link nav-link-2">Sản phẩm yêu thích</a>
                     </li>
+                    <li class="nav-item">
+                        <a href="" data-target="#createKeyPair" data-toggle="tab" class="nav-link nav-link-2">Tạo cặp khóa mới</a>
+                    </li>
+
                 </ul>
                 <div class="tab-content py-4">
+
                     <div class="tab-pane active" id="profile">
                         <!-- <h5 class="mb-3">Thông Tin Tài Khoản</h5> -->
                         <div class="row">
@@ -366,9 +371,30 @@
         %>
     </div>
 </div>
+                    <!-- Tab "Tạo Cặp Khóa Mới" -->
+                    <div class="tab-pane" id="createKeyPair">
+                        <header>
+                            <h1>Tạo Cặp Khóa Mới</h1>
+                            <div class="content">Tạo một cặp khóa mới để bảo mật tài khoản của bạn.</div>
+                        </header>
+
+                        <!-- Nút Tạo Cặp Khóa Mới -->
+                        <button id="createKeyPairButton" class="btn btn-primary" onclick="createKeyPair()">Tạo Cặp Khóa Mới</button>
+
+                        <!-- Thông báo khi tạo cặp khóa thành công -->
+                        <div id="keyPairMessage" style="margin-top: 20px; display:none;">
+                            <div class="alert alert-success" role="alert">
+                                Cặp khóa mới đã được tạo thành công!
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
+
             </div>
+
+
             <div class="col-lg-4 order-lg-1 text-center img-2">
                 <div class="img-ava">
                     <img src="${sessionScope.auth.avatar}" class="mx-auto img-fluid img-circle d-block" id="avatar" style="border-radius: 1px">

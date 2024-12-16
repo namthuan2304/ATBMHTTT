@@ -15,7 +15,7 @@ public class RSAKeyGeneratorImpl implements IKeyGenerator {
     public KeyPair generateKeyPair() throws Exception {
         // Khởi tạo đối tượng KeyPairGenerator cho RSA
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(2048);  // Đặt độ dài khóa là 2048 bit
+        keyPairGenerator.initialize(4096);  // Đặt độ dài khóa là 2048 bit
         return keyPairGenerator.generateKeyPair();  // Phát sinh cặp khóa
     }
 
