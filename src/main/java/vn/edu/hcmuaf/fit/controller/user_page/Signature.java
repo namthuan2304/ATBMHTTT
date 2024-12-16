@@ -39,7 +39,7 @@ public class Signature {
     }
 
     public String decrypt(String base64) throws Exception {
-        Cipher cipher = Cipher.getInstance("RSA");
+        Cipher cipher = Cipher.getInstance("SHA-256withRSA");
         byte[] in = Base64.getDecoder().decode(base64);
         cipher.init(Cipher.DECRYPT_MODE, publicKey);
         byte[] out = cipher.doFinal(in);

@@ -1,9 +1,12 @@
 package vn.edu.hcmuaf.fit.dao.impl;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import vn.edu.hcmuaf.fit.controller.user_page.Hash;
 import vn.edu.hcmuaf.fit.dao.IOrderDAO;
-import vn.edu.hcmuaf.fit.model.Order;
-import vn.edu.hcmuaf.fit.model.OrderItem;
+import vn.edu.hcmuaf.fit.model.*;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
@@ -86,12 +89,34 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
         return queryForMap(sql, new OrderItemMapper(), true, userId);
     }
 
-    public static void main(String[] args) {
-        Map<Order, List<OrderItem>> entry = OrderDAO.getInstance().loadOrderProductByUser(80);
+    public static void main(String[] args) throws NoSuchAlgorithmException {
+        List<User> listUser = UserDAO.getInstance().loadUsersWithId(82);
+        User user = listUser.get(0);
+        JsonObject root = new JsonObject();
+        root.addProperty("userId",user.getId());
+        root.addProperty("username",user.getUsername());
+        root.addProperty("email",user.getEmail());
+        Map<Order, List<OrderItem>> entry = OrderDAO.getInstance().loadLatestOrderByUser(user.getId());
         for (Map.Entry<Order, List<OrderItem>> e : entry.entrySet()) {
-            System.out.println(e.getKey());
-            System.out.println(e.getValue());
+            root.addProperty("date_created",e.getKey().getDateCreated().toString());
+            Order order = e.getKey();
+            System.out.println(e.getKey().getStatus().getId());
+            JsonArray array = new JsonArray();
+            for (OrderItem oi : e.getValue()) {
+                JsonObject orderItem = new JsonObject();
+                orderItem.addProperty("order_id",oi.getOrder().getId());
+                orderItem.addProperty("product_id",oi.getProduct().getId());
+                orderItem.addProperty("quantity",oi.getQuantity());
+                orderItem.addProperty("order_price",oi.getOrderPrice());
+                array.add(orderItem);
+            }
+            root.add("order", array);
         }
+        System.out.println(root.toString());
+        String json = root.toString();
+        Hash hash = new Hash();
+        String hashJson = hash.hash(json);
+        System.out.println(hashJson);
     }
 
     @Override
@@ -154,6 +179,14 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
     public List<Order> hasDatePayment(Integer orderId) {
         String sql = "SELECT * FROM orders WHERE id = ? AND date_payment IS NOT NULL";
         return query(sql, Order.class, orderId);
+    }
+
+    @Override
+    public Map<Order, List<OrderItem>> loadLatestOrderByUser(Integer userId) {
+        String sql = "SELECT o.*, i.* FROM (" +
+                " SELECT * FROM orders WHERE user_id = ? ORDER BY date_created DESC LIMIT 1" +
+                ") AS o LEFT JOIN order_items i ON o.id = i.order_id";
+        return queryForMap(sql, new OrderItemMapper(), true, userId);
     }
 
     @Override
