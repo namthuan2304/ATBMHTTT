@@ -2,7 +2,7 @@
 
 ### **Môn học**: Data Warehouse  
 ### **Năm học**: 2024  
-### **Giảng viên hướng dẫn**: Th.S Nguyễn Đức Công Song 
+### **Giảng viên hướng dẫn**: Th.S Phan Đình Long
 ### **Thành viên nhóm**:
 - Đặng Nam Thuận - 21130556
 
