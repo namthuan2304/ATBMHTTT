@@ -5,9 +5,7 @@
 ### **Giảng viên hướng dẫn**: Th.S Nguyễn Đức Công Song 
 ### **Thành viên nhóm**:
 - Đặng Nam Thuận - 21130556
-- Nguyễn Hữu Thành Luân - 21130556
-- Lê Bá Phụng - 21130482
-- Nguyễn Phi Long - 21130437
+
 
 ---
 
