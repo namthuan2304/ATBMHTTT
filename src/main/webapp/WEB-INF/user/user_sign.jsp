@@ -60,13 +60,13 @@
         button:hover {
             background-color: #0056b3;
         }
-        input{
+
+        input {
             border-radius: 5px;
             width: 100%;
             margin-top: 10px;
             padding: 5px;
         }
-
 
 
     </style>
@@ -76,15 +76,47 @@
 <body>
 <div class="container">
     <h1>Đây là mã Hash đơn hàng của bạn:</h1>
-    <p><%=request.getAttribute("hash")%></p>
+    <p><%=request.getAttribute("hash")%>
+    </p>
 
     <form>
-        Chữ ký của bạn:<br>
+        Chữ ký của bạn <span id="error" style="color: red; font-size: 12px">acb</span><br>
         <input type="text" name="signature" id="signature" placeholder="Nhập chữ ký của bạn"/><br>
-        <div style=" text-align: right"><button id="loadSignature" type="submit">Xác nhận</button></div>
+        <div style=" text-align: right">
+            <button id="loadSignature">Xác nhận</button>
+        </div>
     </form>
 
 
 </div>
 </body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    var context = "${pageContext.request.contextPath}";
+    $(document).ready(function() {
+        $('#loadSignature').click(function (event) {
+            event.preventDefault();
+            var signature = $('#signature').val();
+            $.ajax({
+                type: 'POST',
+                data: {
+                    signature: signature,
+                },
+                url: context + '/user/sign',
+                success: handleResponse,
+                error: handleError
+            });
+        });
+        function handleResponse(response) {
+            if (response.status === "success") {
+                    window.location.href = context + "/user/success";
+            } else  if (response.status === "failed"){
+                $('#failed').html("Chữ ký của bạn không hợp lệ!");
+            }
+        }
+        function handleError() {
+            $('#error').html("Connection errors. Please check your network and try again!");
+        }
+    });
+</script>
 </html>

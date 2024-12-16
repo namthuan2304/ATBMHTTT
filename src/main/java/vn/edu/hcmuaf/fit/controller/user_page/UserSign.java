@@ -18,6 +18,8 @@ import vn.edu.hcmuaf.fit.service.impl.UserService;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +37,6 @@ public class UserSign extends HttpServlet {
 
         if (user == null) request.getRequestDispatcher("/WEB-INF/user/signIn.jsp").forward(request, response);
         else {
-            System.out.println(user.getPublicKey());
             root.addProperty("userId", user.getId());
             root.addProperty("username", user.getUsername());
             root.addProperty("email", user.getEmail());
@@ -56,7 +57,7 @@ public class UserSign extends HttpServlet {
                 root.add("order", array);
                 }
             }
-            System.out.println(root.toString());
+//            System.out.println(root.toString());
             Hash hash = new Hash();
             String hashOrder=null;
             try {
@@ -80,19 +81,32 @@ public class UserSign extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("auth");
         String sign = request.getParameter("signature");
-        Signature signature = new Signature();
-        String hashFromClient =null;
-        try {
-            hashFromClient = signature.decrypt(sign);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
+        System.out.println(sign);
         JsonObject root = new JsonObject();
 
         if (user == null) request.getRequestDispatcher("/WEB-INF/user/signIn.jsp").forward(request, response);
         else {
-            System.out.println(user.getPublicKey());
+            Signature signature = new Signature();
+            PublicKey publicKey;
+            try {
+                System.out.println("convert public key");
+                publicKey = signature.convertBase64ToPublicKey(user.getPublicKey());
+                System.out.println(user.getPublicKey());
+                System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
+                signature.publicKey = publicKey;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
+            String hashFromClient =null;
+            try {
+                System.out.println("decrypt sign to hash from client");
+                hashFromClient = signature.decrypt(sign);
+                System.out.println(signature.decrypt(sign));
+                System.out.println(hashFromClient);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             root.addProperty("userId", user.getId());
             root.addProperty("username", user.getUsername());
             root.addProperty("email", user.getEmail());
@@ -125,8 +139,11 @@ public class UserSign extends HttpServlet {
             }
             if (hashFromClient.equals(hashOrder)) {
                 boolean rs = OrderService.getInstance().saveSignature(order, sign, ip, "user/sign");
+                if(rs) response.getWriter().write("{ \"status\": \"success\"}");
+            }else {
+                System.out.println("failed");
+                response.getWriter().write("{ \"status\": \"failed\"}");
             }
-            request.getRequestDispatcher("/WEB-INF/user/order_success.jsp").forward(request, response);
         }
     }
 
