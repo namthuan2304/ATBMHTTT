@@ -283,7 +283,7 @@ public class Checkout extends HttpServlet {
                         try {
                             Order orderNearest = OrderService.getInstance().loadOrderNear(1).keySet().iterator().next();
                             JSONObject orderJson = new JSONObject(orderNearest);
-                            Signature signature = new Signature();
+                            VerifySign signature = new VerifySign();
                             Hash hash = new Hash();
                             // Convert Base64 to PrivateKey
                             try {

@@ -70,8 +70,6 @@
 
 
     </style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
 </head>
 <body>
 <div class="container">
@@ -91,6 +89,8 @@
 </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     var context = "${pageContext.request.contextPath}";
     $(document).ready(function() {
@@ -109,7 +109,8 @@
         });
         function handleResponse(response) {
             if (response.status === "success") {
-                    window.location.href = context + "/user/success";
+                console.log(response.status);
+                window.location.href = context + "/user/success";
             } else  if (response.status === "failed"){
                 $('#failed').html("Chữ ký của bạn không hợp lệ!");
             }

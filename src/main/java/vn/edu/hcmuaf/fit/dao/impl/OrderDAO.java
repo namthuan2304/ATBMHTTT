@@ -7,6 +7,7 @@ import vn.edu.hcmuaf.fit.dao.IOrderDAO;
 import vn.edu.hcmuaf.fit.model.*;
 
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -90,33 +91,11 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
-        List<User> listUser = UserDAO.getInstance().loadUsersWithId(82);
-        User user = listUser.get(0);
-        JsonObject root = new JsonObject();
-        root.addProperty("userId",user.getId());
-        root.addProperty("username",user.getUsername());
-        root.addProperty("email",user.getEmail());
-        Map<Order, List<OrderItem>> entry = OrderDAO.getInstance().loadLatestOrderByUser(user.getId());
-        for (Map.Entry<Order, List<OrderItem>> e : entry.entrySet()) {
-            root.addProperty("date_created",e.getKey().getDateCreated().toString());
-            Order order = e.getKey();
-            System.out.println(e.getKey().getStatus().getId());
-            JsonArray array = new JsonArray();
-            for (OrderItem oi : e.getValue()) {
-                JsonObject orderItem = new JsonObject();
-                orderItem.addProperty("order_id",oi.getOrder().getId());
-                orderItem.addProperty("product_id",oi.getProduct().getId());
-                orderItem.addProperty("quantity",oi.getQuantity());
-                orderItem.addProperty("order_price",oi.getOrderPrice());
-                array.add(orderItem);
-            }
-            root.add("order", array);
-        }
-        System.out.println(root.toString());
-        String json = root.toString();
-        Hash hash = new Hash();
-        String hashJson = hash.hash(json);
-        System.out.println(hashJson);
+        Order order = new Order();
+        order.setId(84);
+        Order o = OrderDAO.getInstance().getOrderStatus(order);
+        System.out.println(o.getDateCreated());
+        OrderDAO.getInstance().saveSignature(84,"Sang");
     }
 
     @Override
@@ -141,8 +120,10 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
 
     @Override
     public boolean updateOrderStatus(Integer orderId, Integer statusId) {
-        String sql = "UPDATE orders SET status_id = ? WHERE id = ?";
-        return update(sql, statusId, orderId);
+        String sql = "UPDATE orders SET status_id = ?, date_created=? WHERE id = ?";
+        Order order = new Order();
+        order.setId(orderId);
+        return update(sql, statusId,this.getOrderStatus(order).getDateCreated(), orderId);
     }
 
     @Override
@@ -192,9 +173,15 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
     @Override
     public boolean saveSignature(int order_id, String signature) {
         // SQL query to update the public_key and keyCreatedDate for the user in the 'users' table
-        String sql = "UPDATE orders SET signature = ? WHERE id = ?";
+        String sql = "UPDATE orders SET signature = ?, date_created = ? WHERE id = ? ";
         // Execute the update and return the result
-        return update(sql, signature, order_id);
+        Order order = new Order();
+        order.setId(order_id);
+        return update(sql, signature, this.getOrderStatus(order).getDateCreated(),order_id);
     }
+
+
+
+
 
 }

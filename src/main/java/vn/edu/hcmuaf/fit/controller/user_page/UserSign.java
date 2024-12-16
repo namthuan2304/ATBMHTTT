@@ -12,6 +12,7 @@ import vn.edu.hcmuaf.fit.dao.impl.OrderDAO;
 import vn.edu.hcmuaf.fit.dao.impl.UserDAO;
 import vn.edu.hcmuaf.fit.model.Order;
 import vn.edu.hcmuaf.fit.model.OrderItem;
+import vn.edu.hcmuaf.fit.model.OrderStatus;
 import vn.edu.hcmuaf.fit.model.User;
 import vn.edu.hcmuaf.fit.service.impl.OrderService;
 import vn.edu.hcmuaf.fit.service.impl.UserService;
@@ -22,6 +23,7 @@ import java.security.PublicKey;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 @WebServlet("/user/sign")
 public class UserSign extends HttpServlet {
@@ -37,36 +39,36 @@ public class UserSign extends HttpServlet {
 
         if (user == null) request.getRequestDispatcher("/WEB-INF/user/signIn.jsp").forward(request, response);
         else {
-            root.addProperty("userId", user.getId());
-            root.addProperty("username", user.getUsername());
-            root.addProperty("email", user.getEmail());
+
             Map<Order, List<OrderItem>> entry = OrderDAO.getInstance().loadLatestOrderByUser(user.getId());
             for (Map.Entry<Order, List<OrderItem>> e : entry.entrySet()) {
                 if (e.getKey().getStatus().getId() == 8) {
-                root.addProperty("date_created", e.getKey().getDateCreated().toString());
+                    root.addProperty("userId", user.getId());
+                    root.addProperty("username", user.getUsername());
+                    root.addProperty("email", user.getEmail());
+                    root.addProperty("date_created", e.getKey().getDateCreated().toString());
 
-                JsonArray array = new JsonArray();
-                for (OrderItem oi : e.getValue()) {
-                    JsonObject orderItem = new JsonObject();
-                    orderItem.addProperty("order_id", oi.getOrder().getId());
-                    orderItem.addProperty("product_id", oi.getProduct().getId());
-                    orderItem.addProperty("quantity", oi.getQuantity());
-                    orderItem.addProperty("order_price", oi.getOrderPrice());
-                    array.add(orderItem);
-                }
-                root.add("order", array);
-                }
+                    JsonArray array = new JsonArray();
+                    for (OrderItem oi : e.getValue()) {
+                        JsonObject orderItem = new JsonObject();
+                        orderItem.addProperty("order_id", oi.getOrder().getId());
+                        orderItem.addProperty("product_id", oi.getProduct().getId());
+                        orderItem.addProperty("quantity", oi.getQuantity());
+                        orderItem.addProperty("order_price", oi.getOrderPrice());
+                        array.add(orderItem);
+                    }
+                    root.add("order", array);
+                    Hash hash = new Hash();
+                    String hashOrder = null;
+                    try {
+                        hashOrder = hash.hash(root.toString());
+                    } catch (NoSuchAlgorithmException e1) {
+                        throw new RuntimeException(e1);
+                    }
+                    request.setAttribute("hash", hashOrder);
+                    request.getRequestDispatcher("/WEB-INF/user/user_sign.jsp").forward(request, response);
+                } else   request.getRequestDispatcher("/WEB-INF/user/index.jsp").forward(request, response);
             }
-//            System.out.println(root.toString());
-            Hash hash = new Hash();
-            String hashOrder=null;
-            try {
-                 hashOrder = hash.hash(root.toString());
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
-            request.setAttribute("hash",hashOrder);
-            request.getRequestDispatcher("/WEB-INF/user/user_sign.jsp").forward(request, response);
         }
     }
 
@@ -86,27 +88,15 @@ public class UserSign extends HttpServlet {
 
         if (user == null) request.getRequestDispatcher("/WEB-INF/user/signIn.jsp").forward(request, response);
         else {
-            Signature signature = new Signature();
+            VerifySign verifySign = new VerifySign();
             PublicKey publicKey;
             try {
-                System.out.println("convert public key");
-                publicKey = signature.convertBase64ToPublicKey(user.getPublicKey());
-                System.out.println(user.getPublicKey());
-                System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
-                signature.publicKey = publicKey;
+                publicKey = verifySign.convertBase64ToPublicKey(user.getPublicKey());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
             System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
-            String hashFromClient =null;
-            try {
-                System.out.println("decrypt sign to hash from client");
-                hashFromClient = signature.decrypt(sign);
-                System.out.println(signature.decrypt(sign));
-                System.out.println(hashFromClient);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+
             root.addProperty("userId", user.getId());
             root.addProperty("username", user.getUsername());
             root.addProperty("email", user.getEmail());
@@ -114,7 +104,6 @@ public class UserSign extends HttpServlet {
             Order order = null;
             for (Map.Entry<Order, List<OrderItem>> e : entry.entrySet()) {
                 order = e.getKey();
-
                 if (e.getKey().getStatus().getId() == 8) {
                     root.addProperty("date_created", e.getKey().getDateCreated().toString());
                     JsonArray array = new JsonArray();
@@ -137,10 +126,29 @@ public class UserSign extends HttpServlet {
             } catch (NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }
-            if (hashFromClient.equals(hashOrder)) {
+            System.out.println(hashOrder);
+            boolean isVerify = false;
+            try {
+                if (verifySign.verify(sign, publicKey, hashOrder)) isVerify = true;
+                else isVerify = false;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("is verify " + isVerify);
+            if (isVerify) {
                 boolean rs = OrderService.getInstance().saveSignature(order, sign, ip, "user/sign");
-                if(rs) response.getWriter().write("{ \"status\": \"success\"}");
-            }else {
+                if (rs) {
+                    OrderStatus orderStatus = new OrderStatus();
+                    orderStatus.setId(1);
+                    order.setStatus(orderStatus);
+                    boolean success = OrderService.getInstance().updateOrderStatus(order, ip, "user/sign");
+                    if (success) {
+                        System.out.println("afdsjkfhkjsd");
+                        response.getWriter().write("{ \"status\": \"success\"}");
+
+                    } else response.getWriter().write("{ \"status\": \"fail\"}");
+                }
+            } else {
                 System.out.println("failed");
                 response.getWriter().write("{ \"status\": \"failed\"}");
             }
