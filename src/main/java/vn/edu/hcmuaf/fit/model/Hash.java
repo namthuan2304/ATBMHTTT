@@ -1,4 +1,4 @@
-package vn.edu.hcmuaf.fit.controller.user_page;
+package vn.edu.hcmuaf.fit.model;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;

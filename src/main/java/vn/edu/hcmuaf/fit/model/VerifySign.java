@@ -1,7 +1,6 @@
-package vn.edu.hcmuaf.fit.controller.user_page;
+package vn.edu.hcmuaf.fit.model;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;

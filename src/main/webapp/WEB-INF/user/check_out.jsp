@@ -178,18 +178,10 @@
               <div class="checkout__order__total">
                 Tổng tiền thanh toán: <br><strong id="all" style="color: red;"><%=request.getAttribute("totalPrice")%> ${unit}</strong>
               </div>
-              <div class="checkout__order__total">
-                Key của bạn: <br>
-                <form class="d-flex align-items-center w-50 mx-auto mt-2">
-                  <input type="file" id="fileInput" style="display: none;">
-                  <input type="text" id="key" class="form-control" disabled value="">
-                  <button type="submit" id="btnKey" class="btn btn-success" style="white-space: nowrap">Load key</button>
-                </form>
-              </div>
             </div>
             <span style="color:red; margin-top: 10px;" id="error"></span>
             <div>
-                <button type="submit" id="btn_submit" class="site-btn">Đặt hàng</button>
+              <button type="submit" id="btn_submit" class="site-btn">Đặt hàng</button>
             </div>
             <div>
               <button type="button" id="btn_vnpay" class="site-btn">Thanh toán ngay</button>
@@ -291,11 +283,11 @@
 <script>
   function handleVnpayClick() {
     const fullName = document.getElementById("full_name").value;
+    console.log(fullName)
     const phone = document.getElementById("phone").value;
     const address = document.getElementById("address").value;
     const email = document.getElementById("email").value;
     const atHome = document.getElementById("at-home").value;
-    const key = document.getElementById("key").value;
     const id = '${param.id}';
     const quantity = '${param.quantity}';
 
@@ -312,7 +304,7 @@
     var quanText = quanId === "0" ? "" : $("#quan option:selected").data('full-name');
     var phuongText = phuongId === "0" ? "" : $("#phuong option:selected").data('full-name');
 
-    const fields = [fullName, phone, address, email, amount, tinhText, quanText, phuongText, key];
+    const fields = [fullName, phone, address, email, amount, tinhText, quanText, phuongText];
     const emptyField = fields.some(field => field === "" || field === undefined || field === null);
     if (emptyField || tinhText === "0" || quanText === "0" || phuongText === "0") {
       document.getElementById('error').innerHTML = "Please fill in all information completely";
@@ -374,10 +366,8 @@
       var fullNamePhuong = $("#phuong option:selected").data('full-name');
       var email = $('#email').val();
       var atHome = $('#at-home').is(':checked');
-      var privateKey = $('#key').val();
       var id = '${param.id}';
       var quantity = '${param.quantity}';
-
       $.ajax({
         type: 'POST',
         data: {
@@ -390,8 +380,7 @@
           address: address,
           atHome: atHome,
           id: id,
-          quantity: quantity,
-          privateKey: privateKey
+          quantity: quantity
         },
         url: context + '/user/checkout',
         success: handleResponse,
@@ -411,29 +400,6 @@
       $('#error').html("Connection errors. Please check your network and try again!");
     }
   });
-</script>
-<script>
-  document.getElementById('btnKey').addEventListener('click', () => {
-    document.getElementById('fileInput').click();
-  });
-
-  document.getElementById('fileInput').addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const readerBase64 = new FileReader();
-      // Read as Base64
-      readerBase64.onload = () => {
-        const fileContent = readerBase64.result; // Nội dung gốc
-        document.getElementById('key').value = fileContent; // Hiển thị nội dung trong input
-      };
-      readerBase64.readAsText(file); // Đọc file dưới dạng văn bản
-    }
-  });
-
-  document.getElementById("btnKey").addEventListener("click", function(event) {
-    event.preventDefault();
-  });
-
 </script>
 </body>
 </html>

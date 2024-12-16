@@ -9,42 +9,37 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import vn.edu.hcmuaf.fit.dao.impl.OrderDAO;
-import vn.edu.hcmuaf.fit.dao.impl.UserDAO;
-import vn.edu.hcmuaf.fit.model.Order;
-import vn.edu.hcmuaf.fit.model.OrderItem;
-import vn.edu.hcmuaf.fit.model.OrderStatus;
-import vn.edu.hcmuaf.fit.model.User;
+import vn.edu.hcmuaf.fit.model.*;
 import vn.edu.hcmuaf.fit.service.impl.OrderService;
-import vn.edu.hcmuaf.fit.service.impl.UserService;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 @WebServlet("/user/sign")
 public class UserSign extends HttpServlet {
-    @Override
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=UTF-8");
+
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("auth");
         JsonObject root = new JsonObject();
 
         if (user == null) request.getRequestDispatcher("/WEB-INF/user/signIn.jsp").forward(request, response);
         else {
-
             Map<Order, List<OrderItem>> entry = OrderDAO.getInstance().loadLatestOrderByUser(user.getId());
+            System.out.println(entry);
             for (Map.Entry<Order, List<OrderItem>> e : entry.entrySet()) {
                 if (e.getKey().getStatus().getId() == 8) {
                     root.addProperty("userId", user.getId());
                     root.addProperty("username", user.getUsername());
+                    System.out.println(user.getUsername());
                     root.addProperty("email", user.getEmail());
                     root.addProperty("date_created", e.getKey().getDateCreated().toString());
 
@@ -83,7 +78,7 @@ public class UserSign extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("auth");
         String sign = request.getParameter("signature");
-        System.out.println(sign);
+//        System.out.println(sign);
         JsonObject root = new JsonObject();
 
         if (user == null) request.getRequestDispatcher("/WEB-INF/user/signIn.jsp").forward(request, response);
@@ -95,7 +90,7 @@ public class UserSign extends HttpServlet {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
+//            System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
 
             root.addProperty("userId", user.getId());
             root.addProperty("username", user.getUsername());
@@ -118,7 +113,7 @@ public class UserSign extends HttpServlet {
                     root.add("order", array);
                 }
             }
-            System.out.println(root.toString());
+//            System.out.println(root.toString());
             Hash hash = new Hash();
             String hashOrder = null;
             try {
@@ -126,7 +121,7 @@ public class UserSign extends HttpServlet {
             } catch (NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println(hashOrder);
+//            System.out.println(hashOrder);
             boolean isVerify = false;
             try {
                 if (verifySign.verify(sign, publicKey, hashOrder)) isVerify = true;
@@ -134,7 +129,7 @@ public class UserSign extends HttpServlet {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("is verify " + isVerify);
+//            System.out.println("is verify " + isVerify);
             if (isVerify) {
                 boolean rs = OrderService.getInstance().saveSignature(order, sign, ip, "user/sign");
                 if (rs) {
@@ -153,9 +148,5 @@ public class UserSign extends HttpServlet {
                 response.getWriter().write("{ \"status\": \"failed\"}");
             }
         }
-    }
-
-    public static void main(String[] args) {
-//        UserService.getInstance().loadUsersWithId().getPublicKey();
     }
 }
