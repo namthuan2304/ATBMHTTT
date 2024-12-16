@@ -1,9 +1,6 @@
 package vn.edu.hcmuaf.fit.service.impl;
 
-import vn.edu.hcmuaf.fit.dao.impl.LevelDAO;
-import vn.edu.hcmuaf.fit.dao.impl.LogDAO;
-import vn.edu.hcmuaf.fit.dao.impl.OrderDAO;
-import vn.edu.hcmuaf.fit.dao.impl.OrderItemDAO;
+import vn.edu.hcmuaf.fit.dao.impl.*;
 import vn.edu.hcmuaf.fit.model.*;
 import vn.edu.hcmuaf.fit.service.IOrderService;
 
@@ -118,6 +115,37 @@ public class OrderService extends LogDAO<Order> implements IOrderService {
             return OrderDAO.getInstance().hasDatePayment(order.getId()).get(0);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    @Override
+    public boolean saveSignature(Order order, String signature, String ip, String address) {
+        try {
+            // Lưu trạng thái trước khi thực hiện cập nhật
+            order.setBeforeData("User with ID=" + order.getId() + " has no public key or existing key is being replaced.");
+
+            // Thực hiện lưu chữ ký
+            boolean success = OrderDAO.getInstance().saveSignature(order.getId(), signature);
+
+            // Ghi nhận trạng thái sau khi thực hiện
+            if (success) {
+                order.setAfterData("Signature saved successfully for order ID=" + order.getId());
+            } else {
+                order.setAfterData("Failed to save signature for order ID=" + order.getId());
+            }
+
+            // Ghi log hoạt động
+            Level logLevel = success
+                    ? LevelDAO.getInstance().getLevel(1).get(0) // Level success
+                    : LevelDAO.getInstance().getLevel(2).get(0); // Level error
+            super.insert(order, logLevel, ip, address);
+
+            return success;
+        } catch (Exception e) {
+            // Xử lý ngoại lệ và ghi log lỗi
+            order.setAfterData("Error saving signature for order ID=" + order.getId() + ": " + e.getMessage());
+            super.insert(order, LevelDAO.getInstance().getLevel(2).get(0), ip, address);
+            return false;
         }
     }
 

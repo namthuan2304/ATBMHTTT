@@ -42,4 +42,6 @@ public interface IOrderService {
     Order getOrderStatus(Order od);
 
     Order hasDatePayment(Order order);
+
+    boolean saveSignature(Order order, String signature, String ip, String address);
 }

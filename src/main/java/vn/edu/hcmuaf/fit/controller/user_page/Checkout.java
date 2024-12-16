@@ -6,12 +6,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.json.JSONObject;
 import vn.edu.hcmuaf.fit.model.*;
 import vn.edu.hcmuaf.fit.service.impl.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +29,7 @@ public class Checkout extends HttpServlet {
         HttpSession session = request.getSession(true);
         User user = (User) session.getAttribute("auth");
         if (user == null) request.getRequestDispatcher("/WEB-INF/user/signIn.jsp").forward(request, response);
+
         else {
             String ip = request.getHeader("X-FORWARDED-FOR");
             if (ip == null) ip = request.getRemoteAddr();
@@ -35,10 +38,10 @@ public class Checkout extends HttpServlet {
             String id = request.getParameter("id");
             Discount discount = (Discount) session.getAttribute("discount");
 
-            if (id == null || id.isEmpty()) {
-                if (!cart.isEmpty()) {
+            if (id == null || id.isEmpty()) { // id ko ton tai (thanh toan tu gio hang)
+                if (!cart.isEmpty()) {        // cart co san pham (khong rong)
                     double re = 0.0;
-                    for(CartItem i : cart) {
+                    for (CartItem i : cart) {
                         Map<Product, List<String>> products = ProductService.getInstance().getProductByIdWithSupplierInfo(new Product(i.getProduct().getId()), ip, "/user/cart");
                         for (Product p : products.keySet()) {
                             re += i.getQuantity() * p.getPrice();
@@ -55,7 +58,8 @@ public class Checkout extends HttpServlet {
                     request.setAttribute("priceShipment", priceShipment);
                     request.getRequestDispatcher("/WEB-INF/user/check_out.jsp").forward(request, response);
                 } else {
-                    request.getRequestDispatcher("/WEB-INF/user/cart.jsp").forward(request, response);
+//                    request.getRequestDispatcher("/WEB-INF/user/cart.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/user/check_out.jsp").forward(request, response);
                 }
             } else {
                 Product p = new Product(Integer.parseInt(id));
@@ -68,10 +72,11 @@ public class Checkout extends HttpServlet {
                     if (quantity == null) {
                         temp.add(new CartItem(user, entry.getKey(), 1));
                     } else {
-                        if (!quantity.equals("") && Integer.parseInt(quantity)>0) temp.add(new CartItem(user, entry.getKey(), Integer.parseInt(quantity)));
+                        if (!quantity.equals("") && Integer.parseInt(quantity) > 0)
+                            temp.add(new CartItem(user, entry.getKey(), Integer.parseInt(quantity)));
                     }
-                    double re = temp.get(0).getQuantity()*entry.getKey().getPrice();
-                    if (discount==null) {
+                    double re = temp.get(0).getQuantity() * entry.getKey().getPrice();
+                    if (discount == null) {
                         session.setAttribute("result", re);
                         request.setAttribute("totalPrice", re + priceShipment);
                     } else {
@@ -105,7 +110,7 @@ public class Checkout extends HttpServlet {
         List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
         Discount discount = (Discount) session.getAttribute("discount");
         String code = request.getParameter("discountCode");
-        String action = request.getParameter("action")==null? "": request.getParameter("action");
+        String action = request.getParameter("action") == null ? "" : request.getParameter("action");
         if (action.equals("check")) {
             if (discount == null) {
                 discount = new Discount();
@@ -119,10 +124,10 @@ public class Checkout extends HttpServlet {
                 for (Product p : products.keySet()) {
                     product = p;
                 }
-                if (quantity != 0) re += product.getPrice()*quantity;
+                if (quantity != 0) re += product.getPrice() * quantity;
                 else re += product.getPrice();
             } else {
-                for(CartItem i : cart) {
+                for (CartItem i : cart) {
                     Map<Product, List<String>> products = ProductService.getInstance().getProductByIdWithSupplierInfo(new Product(i.getProduct().getId()), ip, "/user/cart");
                     for (Product p : products.keySet()) {
                         re += i.getQuantity() * p.getPrice();
@@ -140,21 +145,21 @@ public class Checkout extends HttpServlet {
                     if (discount == null) {
                         session.removeAttribute("discount");
                         session.removeAttribute("retain");
-                        out.write("{ \"state\": \"notfound\", \"error\": \"Mã giảm giá không tồn tại!\", \"rect\": \""+0.0+"\", \"result\": \""+re+"\",  \"last\": \""+(re+priceShipment)+"\"}");
+                        out.write("{ \"state\": \"notfound\", \"error\": \"Mã giảm giá không tồn tại!\", \"rect\": \"" + 0.0 + "\", \"result\": \"" + re + "\",  \"last\": \"" + (re + priceShipment) + "\"}");
                         out.close();
                         return;
                     } else {
-                        if (discount.getQuantity()==0) {
+                        if (discount.getQuantity() == 0) {
                             session.removeAttribute("discount");
                             session.removeAttribute("retain");
-                            out.write("{ \"state\": \"outquantity\", \"error\": \"Mã giảm giá đã hết lượt!\", \"rect\": \""+0.0+"\", \"result\": \""+re+"\" , \"last\": \""+(re+priceShipment)+"\"}");
+                            out.write("{ \"state\": \"outquantity\", \"error\": \"Mã giảm giá đã hết lượt!\", \"rect\": \"" + 0.0 + "\", \"result\": \"" + re + "\" , \"last\": \"" + (re + priceShipment) + "\"}");
                             out.close();
                             return;
                         }
                     }
                 }
             } else {
-                out.write("{ \"state\": \"notempty\", \"error\": \"\", \"rect\": \""+ 0.0 +"\", \"result\": \""+(re+priceShipment)+"\" , \"last\": \""+(re+priceShipment)+"\"}");
+                out.write("{ \"state\": \"notempty\", \"error\": \"\", \"rect\": \"" + 0.0 + "\", \"result\": \"" + (re + priceShipment) + "\" , \"last\": \"" + (re + priceShipment) + "\"}");
                 session.removeAttribute("discount");
                 session.removeAttribute("retain");
                 out.close();
@@ -164,7 +169,7 @@ public class Checkout extends HttpServlet {
             double retain = re - discount.getSalePercent() * re;
             session.setAttribute("result", retain);
             session.setAttribute("retain", re * discount.getSalePercent());
-            out.write("{\"result\": \"" + re + "\", \"rect\": \"" + re * discount.getSalePercent() +"\", \"last\": \""+(retain+priceShipment)+"\"}");
+            out.write("{\"result\": \"" + re + "\", \"rect\": \"" + re * discount.getSalePercent() + "\", \"last\": \"" + (retain + priceShipment) + "\"}");
         } else {
             User user = (User) session.getAttribute("auth");
 
@@ -177,7 +182,8 @@ public class Checkout extends HttpServlet {
             String phuong = request.getParameter("phuong");
 
             String address = request.getParameter("address");
-            boolean atHome = request.getParameter("atHome")==null? false: Boolean.parseBoolean(request.getParameter("atHome"));
+            boolean atHome = request.getParameter("atHome") == null ? false : Boolean.parseBoolean(request.getParameter("atHome"));
+            String privateKey = request.getParameter("privateKey");
 
             boolean ok = true;
             if ((fullName == null) || (fullName.equals(""))) {
@@ -201,6 +207,9 @@ public class Checkout extends HttpServlet {
             if ((address == null) || (address.equals(""))) {
                 ok = false;
             }
+            if ((privateKey == null) || (privateKey.equals(""))) {
+                ok = false;
+            }
 
             if (!ok) {
                 out.write("{\"error\":\"Please fill in all information completely\"}");
@@ -208,6 +217,7 @@ public class Checkout extends HttpServlet {
                 if (user != null) {
                     DeliveryAddress dev = new DeliveryAddress(user, fullName, phone, tinh, quan, phuong, address, atHome, true);
                     DeliveryAddress delivery = DeliveryService.getInstance().addDeliveryAddress(dev, ip, "/user/checkout");
+                    // insert delivery thanh cong
 
                     Order order = new Order();
                     order.setUser(user);
@@ -216,6 +226,7 @@ public class Checkout extends HttpServlet {
                     ShippingType shippingType = new ShippingType();
                     shippingType.setId(1);
                     order.setType(shippingType);
+
                     if (discount != null) order.setDiscount(discount);
                     else order.setDiscount(new Discount());
 
@@ -265,8 +276,47 @@ public class Checkout extends HttpServlet {
                         session.removeAttribute("discount");
                         session.removeAttribute("retain");
                         session.removeAttribute("result");
-                        out.write("{ \"status\": \"success\"}");
+//                        out.write("{ \"status\": \"success\"}");
                     }
+
+                    if (privateKey != null && !privateKey.isEmpty()) {
+                        try {
+                            Order orderNearest = OrderService.getInstance().loadOrderNear(1).keySet().iterator().next();
+                            JSONObject orderJson = new JSONObject(orderNearest);
+                            VerifySign signature = new VerifySign();
+                            Hash hash = new Hash();
+                            // Convert Base64 to PrivateKey
+                            try {
+                                signature.privateKey = signature.convertBase64ToPrivateKey(privateKey);
+                                System.out.println(Base64.getEncoder().encodeToString(signature.privateKey.getEncoded()));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                out.write("{ \"status\": \"Error\"}");
+                                return;
+                            }
+
+                            // Hash and sign order
+                            try {
+                                String hashOrder = hash.hash(orderJson.toString());
+                                String sign = signature.encryptBase64(hashOrder);
+                                boolean rs = OrderService.getInstance().saveSignature(orderNearest, sign, ip, "/user/checkout");
+                                if (rs) {
+                                    out.write("{ \"status\": \"success\"}");
+                                } else {
+                                    out.write("{ \"status\": \"Error\"}");
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                out.write("{ \"status\": \"Error\"}");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            out.write("{ \"status\": \"Error\"}");
+                        }
+                    } else {
+                        out.write("{ \"status\": \"Error\"}");
+                    }
+
                 } else {
                     out.write("{\"status\": \"failed\"}");
                 }
@@ -274,5 +324,9 @@ public class Checkout extends HttpServlet {
         }
         out.flush();
         out.close();
+    }
+
+    public static void main(String[] args) {
+
     }
 }
