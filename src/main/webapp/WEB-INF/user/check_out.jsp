@@ -389,7 +389,7 @@
     });
     function handleResponse(response) {
       if (response.status === "success") {
-        window.location.href = context + "/user/success";
+        window.location.href = context + "/user/sign";
       } else if(response.status === "failed") {
         window.location.href = context + "/user/signin";
       } else {

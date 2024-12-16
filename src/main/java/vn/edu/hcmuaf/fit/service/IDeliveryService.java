@@ -21,4 +21,5 @@ public interface IDeliveryService {
 
     boolean deleteDeliveryAddress(DeliveryAddress delivery, String ip, String address);
 
+    DeliveryAddress getAddressById(Integer id);
 }
