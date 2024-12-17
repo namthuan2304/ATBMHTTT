@@ -128,7 +128,6 @@ public class UserSign extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("auth");
         String sign = request.getParameter("signature");
-//        System.out.println(sign);
         JsonObject root = new JsonObject();
 
         if (user == null) request.getRequestDispatcher("/WEB-INF/user/signIn.jsp").forward(request, response);
@@ -140,7 +139,7 @@ public class UserSign extends HttpServlet {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-//            System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
+//          System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
 
             root.addProperty("userId", user.getId());
             root.addProperty("username", user.getUsername());

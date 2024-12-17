@@ -14,6 +14,22 @@
     <title>Đăng nhập</title>
     <script type="text/javascript">
         var context = "${pageContext.request.contextPath}";
+
+        // Toggle password visibility function
+        function togglePassword() {
+            var passwordInput = document.getElementById('password');
+            var toggleIcon = document.getElementById('toggle-password-icon');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
         $(document).ready(function() {
             $('#btnLogin').click(function (event) {
                 event.preventDefault();
@@ -35,10 +51,8 @@
                                 $('#errorLogin').html(result.message);
                                 $('#success').html("");
                             } else if (result.status === "generateKey") {
-                                // Chuyển hướng đến generateKey
                                 window.location.href = context + "/user/generateKey";
                             } else if (result.status === "success") {
-                                // Chuyển hướng đến trang được chỉ định
                                 window.location.href = context + "/" + result.redirect;
                             } else {
                                 console.error("Unexpected response: ", result);
@@ -52,24 +66,6 @@
                         $('#errorLogin').html("Connection errors. Please check your network and try again!");
                     }
                 });
-            });
-
-            var baseUri = "http://localhost:8080/user/signin?apis=";
-
-            // Facebook login link
-            document.addEventListener('DOMContentLoaded', function () {
-                var encodedUri = encodeURIComponent(baseUri + "Facebook");
-                var facebookUrl = "https://www.facebook.com/v19.0/dialog/oauth?fields=id,name,first_name,email,picture&client_id=834857594884300&redirect_uri=" + encodedUri;
-                var linkElement = document.getElementById('facebook-login-link');
-                linkElement.href = facebookUrl;
-            });
-
-            // Twitter login link
-            document.addEventListener('DOMContentLoaded', function () {
-                var encodedUri = encodeURIComponent(baseUri + "Twitter");
-                var twitterUrl = "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=ejk3azBSZE1pMkNzZi0xOGdfTmo6MTpjaQ&redirect_uri=" + encodedUri + "&scope=tweet.read%20users.read%20follows.read%20offline.access&state=state&code_challenge=challenge&code_challenge_method=plain";
-                var linkElement = document.getElementById('x-login-link');
-                linkElement.href = twitterUrl;
             });
         });
     </script>
@@ -87,8 +83,9 @@
                     <input type="email" id="email" name="email" placeholder="Email" value="${empty email ? '' : email}" required>
                     <div id="email-error" style="color: red;"></div>
                 </div>
-                <div class="input-group">
+                <div style="position: relative" class="input-group position-relative">
                     <input type="password" id="password" name="password" placeholder="Mật khẩu" value="${empty password ? '' : password}" required>
+                    <i id="toggle-password-icon" class="fas fa-eye" onclick="togglePassword()" style="cursor: pointer; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);"></i>
                     <div id="password-error" style="color: red;"></div>
                 </div>
                 <div class="terms-checkbox">
