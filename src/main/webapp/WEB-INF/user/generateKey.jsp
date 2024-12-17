@@ -320,7 +320,6 @@
             });
         }
 
-        // Xử lý sự kiện nhấn nút "Generate Key"
         $('#generateKeyButton').click(function () {
             $.ajax({
                 url: '/user/generateKey?download=true',  // Điều chỉnh URL để phù hợp với phương thức Java
@@ -328,13 +327,18 @@
                 xhrFields: {
                     responseType: 'blob' // Xử lý file dưới dạng blob
                 },
-                success: function (blob) {
+                success: function (blob, textStatus, xhr) {
+                    // Lấy tên file từ header Content-Disposition
+                    const contentDisposition = xhr.getResponseHeader('Content-Disposition');
+                    const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
+                    const fileName = fileNameMatch ? fileNameMatch[1] : 'default_filename.zip'; // Nếu không có tên file, đặt tên mặc định
+
                     // Tạo một URL blob từ phản hồi server
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.style.display = 'none';
                     a.href = url;
-                    a.download = 'tools_and_private_key.zip'; // Tên file khi tải về
+                    a.download = fileName; // Sử dụng tên file lấy từ header
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url); // Xóa URL blob sau khi tải file

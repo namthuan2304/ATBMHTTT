@@ -12,6 +12,7 @@ import vn.edu.hcmuaf.fit.service.IUserService;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class UserService extends LogDAO<User> implements IUserService {
@@ -462,6 +463,40 @@ public class UserService extends LogDAO<User> implements IUserService {
             Level logLevel = success
                     ? LevelDAO.getInstance().getLevel(1).get(0) // Level success
                     : LevelDAO.getInstance().getLevel(2).get(0); // Level error
+            super.insert(user, logLevel, ip, address);
+
+            return success;
+        } catch (Exception e) {
+            // Xử lý ngoại lệ và ghi log lỗi
+            user.setAfterData("Error saving public key for User ID=" + user.getId() + ": " + e.getMessage());
+            super.insert(user, LevelDAO.getInstance().getLevel(2).get(0), ip, address);
+            return false;
+        }
+    }
+    @Override
+    public boolean savePublicKeyOnLost(User user, String publicKey, String ip, String address) {
+        try {
+            LocalDateTime now = LocalDateTime.now();
+
+            // Lưu trạng thái trước khi thực hiện cập nhật
+            user.setBeforeData("User with ID=" + user.getId() + " is reporting key loss. Public key is being replaced.");
+
+              // Lưu khóa công khai mới vào cơ sở dữ liệu
+            boolean success = UserDAO.getInstance().savePublicKeyOnLost(user.getId(), publicKey);
+
+            // Ghi nhận trạng thái sau khi thực hiện
+            if (success) {
+                user.setAfterData("Public key saved successfully for User ID=" + user.getId() + ". Key lost at: " + now);
+            } else {
+                user.setAfterData("Failed to save public key for User ID=" + user.getId() + ". Key loss reported at: " + now);
+            }
+
+            // Ghi log hoạt động
+            Level logLevel = success
+                    ? LevelDAO.getInstance().getLevel(1).get(0) // Success log level
+                    : LevelDAO.getInstance().getLevel(2).get(0); // Error log level
+
+            // Ghi log vào hệ thống
             super.insert(user, logLevel, ip, address);
 
             return success;

@@ -133,7 +133,7 @@ public class GenerateKey extends HttpServlet {
             }
 
             // Thêm file private_key.pem vào zip
-            ZipEntry privateKeyEntry = new ZipEntry("private_key.pem");
+            ZipEntry privateKeyEntry = new ZipEntry(userEmail+"_private_key.pem");
             zipOutputStream.putNextEntry(privateKeyEntry);
             zipOutputStream.write(privateKeyBytes);
             zipOutputStream.closeEntry();

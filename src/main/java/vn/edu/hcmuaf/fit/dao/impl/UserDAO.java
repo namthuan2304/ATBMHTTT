@@ -195,6 +195,15 @@ public class UserDAO extends AbsDAO<User> implements IUserDAO {
         return update(sql, publicKey, userId);
 }
 
+    @Override
+    public boolean savePublicKeyOnLost(Integer userId, String publicKey) {
+        // SQL query to update the public_key, keyCreatedDate, and keyEndDate for the user in the 'users' table
+        String sql = "UPDATE users SET public_key = ?, keyCreatedDate = CURRENT_TIMESTAMP, keyEndDate = CURRENT_TIMESTAMP WHERE id = ?";
+
+        // Execute the update and return the result
+        return update(sql, publicKey, userId);
+    }
+
 
 
 }
