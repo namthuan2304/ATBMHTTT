@@ -63,7 +63,7 @@
                     <li class="menu-item">
                         <a href="${request.servletContext.contextPath}/user/feedback"><span class="nav-link-text" style="white-space: nowrap">Liên hệ</span></a>
                     </li>
-                    <li class="menu-item">
+                    <li style="white-space: nowrap" class="menu-item">
                         <a href="${request.servletContext.contextPath}/user/downloadToolKySo">
                             Tải Tool Ký Số
                         </a>

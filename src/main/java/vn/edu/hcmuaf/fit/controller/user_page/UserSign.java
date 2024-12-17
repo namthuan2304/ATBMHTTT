@@ -57,7 +57,7 @@ public class UserSign extends HttpServlet {
 
                 // update and get discount info
                 Field[] discountFields = null;
-                if (order.getDiscount().getId() != null) {
+                if(order.getDiscount().getId()!=null) {
                     order.setDiscount(DiscountService.getInstance().getCouponById(order.getDiscount().getId()));
                     Class<?> discountClass = order.getDiscount().getClass();
                     discountFields = discountClass.getDeclaredFields();
@@ -76,11 +76,11 @@ public class UserSign extends HttpServlet {
                             field.setAccessible(true);
                             String fieldName = field.getName();
                             Object value = field.get(order.getAddress());
-                            if (!fieldName.equalsIgnoreCase("id") && !fieldName.equalsIgnoreCase("user") && value != null) {
+                            if (!fieldName.equalsIgnoreCase("id") &&!fieldName.equalsIgnoreCase("user") && value != null) {
                                 root.addProperty(fieldName, value.toString());
                             }
                         }
-                        if (discountFields != null) {
+                        if(discountFields != null) {
                             for (Field field : discountFields) {
                                 field.setAccessible(true);
                                 String fieldName = field.getName();
@@ -128,7 +128,6 @@ public class UserSign extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("auth");
         String sign = request.getParameter("signature");
-//        System.out.println(sign);
         JsonObject root = new JsonObject();
 
         if (user == null) request.getRequestDispatcher("/WEB-INF/user/signIn.jsp").forward(request, response);
@@ -162,6 +161,7 @@ public class UserSign extends HttpServlet {
                     Class<?> discountClass = order.getDiscount().getClass();
                     discountFields = discountClass.getDeclaredFields();
                 }
+//          System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
 
                 // check if order is not signed
                 if (order.getStatus().getId() == 8) {
