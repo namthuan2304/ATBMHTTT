@@ -23,10 +23,7 @@ public class GenerateKey extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=UTF-8");
-        String action = request.getParameter("action");
-        if(action != null && action.equals("changeKey")) {
 
-        }else{
             // Kiểm tra session
             HttpSession session = request.getSession(false); // Không tạo session mới
             User user = (session != null) ? (User) session.getAttribute("auth") : null;
@@ -45,7 +42,6 @@ public class GenerateKey extends HttpServlet {
 
             // Nếu đã có public key, chuyển hướng về trang chủ hoặc xử lý khác
             response.sendRedirect("/user/home");
-        }
     }
 
 

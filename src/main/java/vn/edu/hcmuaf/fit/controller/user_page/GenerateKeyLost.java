@@ -15,10 +15,15 @@ import java.io.IOException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.sql.Timestamp;
 import java.util.Base64;
 
 @WebServlet("/user/generateKeyLost")
 public class GenerateKeyLost extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doPost(req, resp);
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -47,6 +52,8 @@ public class GenerateKeyLost extends HttpServlet {
             // Lưu thông tin public key vào cơ sở dữ liệu
             String ip = request.getRemoteAddr();
             UserService.getInstance().savePublicKeyOnLost(user, publicKeyBase64, ip, "/user/generateKeyLost");
+            String linkKey = (String) session.getAttribute("linkKey");
+            Long linkKeyExpiry = (Long) session.getAttribute("linkKeyExpiry");
 
             // Cập nhật public key vào session và cơ sở dữ liệu
             user.setPublicKey(publicKeyBase64);
@@ -54,12 +61,18 @@ public class GenerateKeyLost extends HttpServlet {
 
             // Kiểm tra nếu yêu cầu tải private key
             String download = request.getParameter("download");
-            if ("true".equalsIgnoreCase(download)) {
-                // Nếu yêu cầu tải private key, trả về private key dưới dạng base64
-                sendPrivateKey(response, privateKeyBase64, user.getEmail());
-                return;  // Dừng xử lý thêm, vì file đã được gửi về
+            if (linkKey != null && linkKeyExpiry != null && System.currentTimeMillis() <= linkKeyExpiry) {
+                if ("true".equalsIgnoreCase(download)) {
+                    // Nếu yêu cầu tải private key, trả về private key dưới dạng base64
+                    sendPrivateKey(response, privateKeyBase64, user.getEmail());
+                    return;  // Dừng xử lý thêm, vì file đã được gửi về
+                }
+            }else {
+                // Link hết hạn
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Link đã hết hạn hoặc không hợp lệ.");
+                session.removeAttribute("linkKey");
+                session.removeAttribute("linkKeyExpiry");
             }
-
             // Trả về thông báo thành công
             response.getWriter().write("{\"status\":\"success\", \"message\":\"Keys generated successfully.\"}");
 

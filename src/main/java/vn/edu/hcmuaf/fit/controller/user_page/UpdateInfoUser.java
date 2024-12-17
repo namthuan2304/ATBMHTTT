@@ -24,6 +24,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @WebServlet("/user/updateinfouser")
 @MultipartConfig
@@ -171,10 +174,13 @@ public class UpdateInfoUser extends HttpServlet {
             out.close();
         } else if (action.equals("change")) {
             SendEmail sendEmail = new SendEmail();
-            String link="http://localhost:8080/user/generateKey?action=changeKey";
-            if (sendEmail.sendLinkKey(user.getEmail(),link)){
+            String link = "http://localhost:8080/user/generateKeyLost?download=true";
+
+            if (sendEmail.sendLinkKey(user.getEmail(), link)) {
+                session.setAttribute("linkKey", link);
+                session.setAttribute("linkKeyExpiry", System.currentTimeMillis() + 30000); // Hết hạn sau 30 giây
                 out.write("{\"status\":\"success\"}");
-            }else out.write("{\"status\":\"fail\"}");
+            } else out.write("{\"status\":\"fail\"}");
         }
     }
 }
