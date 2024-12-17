@@ -848,6 +848,48 @@
         });
     });
 </script>
+<script>
+    // Hàm tải private key từ server
+    function downloadPrivateKey() {
+        fetch('/user/generateKeyLost?download=true', {
+            method: 'POST', // POST request vì chúng ta đang yêu cầu tải file
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Lấy tên file từ header Content-Disposition
+                    const contentDisposition = response.headers.get('Content-Disposition');
+                    const fileNameMatch = contentDisposition && contentDisposition.match(/filename="(.+)"/);
+                    const fileName = fileNameMatch ? fileNameMatch[1] : 'private_key.pem'; // Nếu không có tên file, đặt tên mặc định
+
+    // Chuyển phản hồi thành blob (file)
+                    return response.blob().then(blob => ({ blob, fileName }));
+                } else {
+                    throw new Error('Lỗi khi tải private key.');
+                }
+            })
+            .then(({ blob, fileName }) => {
+                // Tạo một URL từ blob và tải xuống file
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = fileName; // Sử dụng tên file lấy từ header
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url); // Xóa URL sau khi tải xong
+
+                // Thông báo thành công
+                alert('Private key đã được tải xuống thành công!');
+            })
+            .catch(error => {
+                console.error('Error downloading private key:', error);
+                alert('Đã xảy ra lỗi khi tải private key.');
+            });
+    }
+</script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.0.5/datatables.min.css" rel="stylesheet">
 
