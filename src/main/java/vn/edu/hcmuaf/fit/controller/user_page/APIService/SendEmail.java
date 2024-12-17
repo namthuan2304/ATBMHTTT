@@ -18,4 +18,8 @@ public class SendEmail {
         EmailSender emailSender = new EmailSender();
         return emailSender.sendEmail(email, "Resend password", "Your password here: " + pass);
     }
+    public boolean sendLinkKey(String email, String link) {
+        EmailSender emailSender = new EmailSender();
+        return emailSender.sendEmail(email, "Resend link key", "Your link key here: " + link);
+    }
 }

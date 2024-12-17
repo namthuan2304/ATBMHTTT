@@ -19,6 +19,7 @@ import vn.edu.hcmuaf.fit.service.impl.OrderService;
 import vn.edu.hcmuaf.fit.service.impl.ProductService;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -129,7 +130,7 @@ public class UserSign extends HttpServlet {
         User user = (User) session.getAttribute("auth");
         String sign = request.getParameter("signature");
         JsonObject root = new JsonObject();
-
+        PrintWriter out = response.getWriter();
         if (user == null) request.getRequestDispatcher("/WEB-INF/user/signIn.jsp").forward(request, response);
         else {
             VerifySign verifySign = new VerifySign();
@@ -139,63 +140,100 @@ public class UserSign extends HttpServlet {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+//            System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
+            Map<Order, List<OrderItem>> map = OrderDAO.getInstance().loadLatestOrderByUser(user.getId());
+            for (Map.Entry<Order, List<OrderItem>> entry : map.entrySet()) {
+                List<OrderItem> items = entry.getValue();
+                Order order = entry.getKey();
+
+                // get user info
+                Class<?> userClass = user.getClass();
+                Field[] userFields = userClass.getDeclaredFields();
+
+                // update and get delivery info
+                order.setAddress(DeliveryService.getInstance().getAddressById(order.getAddress().getId()));
+                Class<?> deliveryClass = order.getAddress().getClass();
+                Field[] deliveryFields = deliveryClass.getDeclaredFields();
+
+                // update and get discount info
+                Field[] discountFields = null;
+                if (order.getDiscount().getId() != null) {
+                    order.setDiscount(DiscountService.getInstance().getCouponById(order.getDiscount().getId()));
+                    Class<?> discountClass = order.getDiscount().getClass();
+                    discountFields = discountClass.getDeclaredFields();
+                }
 //          System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
 
-            root.addProperty("userId", user.getId());
-            root.addProperty("username", user.getUsername());
-            root.addProperty("email", user.getEmail());
-            Map<Order, List<OrderItem>> entry = OrderDAO.getInstance().loadLatestOrderByUser(user.getId());
-            Order order = null;
-            for (Map.Entry<Order, List<OrderItem>> e : entry.entrySet()) {
-                order = e.getKey();
-                if (e.getKey().getStatus().getId() == 8) {
-                    root.addProperty("date_created", e.getKey().getDateCreated().toString());
-                    JsonArray array = new JsonArray();
-                    for (OrderItem oi : e.getValue()) {
-                        JsonObject orderItem = new JsonObject();
-                        orderItem.addProperty("order_id", oi.getOrder().getId());
-                        orderItem.addProperty("product_id", oi.getProduct().getId());
-                        orderItem.addProperty("quantity", oi.getQuantity());
-                        orderItem.addProperty("order_price", oi.getOrderPrice());
-                        array.add(orderItem);
-                    }
-                    root.add("order", array);
-                }
-            }
-//            System.out.println(root.toString());
-            Hash hash = new Hash();
-            String hashOrder = null;
-            try {
-                hashOrder = hash.hash(root.toString());
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
-//            System.out.println(hashOrder);
-            boolean isVerify = false;
-            try {
-                if (verifySign.verify(sign, publicKey, hashOrder)) isVerify = true;
-                else isVerify = false;
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-//            System.out.println("is verify " + isVerify);
-            if (isVerify) {
-                boolean rs = OrderService.getInstance().saveSignature(order, sign, ip, "user/sign");
-                if (rs) {
-                    OrderStatus orderStatus = new OrderStatus();
-                    orderStatus.setId(1);
-                    order.setStatus(orderStatus);
-                    boolean success = OrderService.getInstance().updateOrderStatus(order, ip, "user/sign");
-                    if (success) {
-//                        System.out.println("afdsjkfhkjsd");
-                        response.getWriter().write("{ \"status\": \"success\"}");
+                // check if order is not signed
+                if (order.getStatus().getId() == 8) {
+                    try {
+                        root.addProperty("order_id", order.getId());
 
-                    } else response.getWriter().write("{ \"status\": \"fail\"}");
-                }
-            } else {
-                System.out.println("failed");
-                response.getWriter().write("{ \"status\": \"failed\"}");
+                        root.addProperty("user_id", user.getId());
+                        root.addProperty("username", user.getUsername());
+                        root.addProperty("user_email", user.getEmail());
+
+                        for (Field field : deliveryFields) {
+                            field.setAccessible(true);
+                            String fieldName = field.getName();
+                            Object value = field.get(order.getAddress());
+                            if (!fieldName.equalsIgnoreCase("id") && !fieldName.equalsIgnoreCase("user") && value != null) {
+                                root.addProperty(fieldName, value.toString());
+                            }
+                        }
+                        if (discountFields != null) {
+                            for (Field field : discountFields) {
+                                field.setAccessible(true);
+                                String fieldName = field.getName();
+                                Object value = field.get(order.getDiscount());
+                                if (!fieldName.equalsIgnoreCase("id") && !fieldName.equalsIgnoreCase("description") && !fieldName.equalsIgnoreCase("date_created")
+                                        && value != null) {
+                                    root.addProperty(fieldName, value.toString());
+                                }
+                            }
+                        }
+                        root.addProperty("date_created", order.getDateCreated().toString());
+                        JsonArray array = new JsonArray();
+                        for (OrderItem item : items) {
+                            item.setProduct(ProductService.getInstance().getProductById(item.getProduct().getId()));
+                            JsonObject orderItem = new JsonObject();
+                            orderItem.addProperty("product_id", item.getProduct().getId());
+                            orderItem.addProperty("product_name", item.getProduct().getProductName());
+                            orderItem.addProperty("quantity", item.getQuantity());
+                            orderItem.addProperty("order_price", item.getOrderPrice());
+                            array.add(orderItem);
+                        }
+                        root.add("order", array);
+                        Hash hash = new Hash();
+                        String hashOrder = null;
+                        hashOrder = hash.hash(root.toString());
+                        request.setAttribute("hash", hashOrder);
+                        System.out.println(root.toString());
+                        if (verifySign.verify(sign, publicKey, hashOrder)) {
+                            boolean rs = OrderService.getInstance().saveSignature(order, sign, ip, "user/sign");
+                            if (rs) {
+                                OrderStatus orderStatus = new OrderStatus();
+                                orderStatus.setId(1);
+                                order.setStatus(orderStatus);
+                                boolean success = OrderService.getInstance().updateOrderStatus(order, ip, "user/sign");
+                                if (success) {
+                                    System.out.println("success");
+                                   out.write("{ \"check\": \"success\"}");
+                                } else out.write("{ \"check\": \"failed\"}");
+                            }
+                        } else {
+                            System.out.println("failed");
+                            out.write("{ \"check\": \"error\"}");
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    out.close();
+                } else request.getRequestDispatcher("/WEB-INF/user/index.jsp").forward(request, response);
+
             }
+
         }
     }
 }

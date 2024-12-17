@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import org.mindrot.jbcrypt.BCrypt;
+import vn.edu.hcmuaf.fit.controller.user_page.APIService.SendEmail;
 import vn.edu.hcmuaf.fit.model.Order;
 import vn.edu.hcmuaf.fit.model.OrderItem;
 import vn.edu.hcmuaf.fit.model.User;
@@ -59,6 +60,7 @@ public class UpdateInfoUser extends HttpServlet {
         if (ip == null) ip = req.getRemoteAddr();
 
         String action = req.getParameter("action");
+        String email;
         if ("set".equals(action)) {
             try {
                 Part filePart = req.getPart("filename"); // Lấy file từ request
@@ -85,8 +87,8 @@ public class UpdateInfoUser extends HttpServlet {
             }
         } else if (action.equals("update")) {
             String fullName = req.getParameter("fullName");
-            String birthday = !req.getParameter("birthday").isEmpty()?req.getParameter("birthday"):null;
-            String email = req.getParameter("email");
+            String birthday = !req.getParameter("birthday").isEmpty() ? req.getParameter("birthday") : null;
+            email = req.getParameter("email");
             String phone = req.getParameter("phone");
             String city = req.getParameter("tinh");
             String district = req.getParameter("quan");
@@ -167,6 +169,12 @@ public class UpdateInfoUser extends HttpServlet {
             }
             out.flush();
             out.close();
+        } else if (action.equals("change")) {
+            SendEmail sendEmail = new SendEmail();
+            String link="http://localhost:8080/user/generateKey?action=changeKey";
+            if (sendEmail.sendLinkKey(user.getEmail(),link)){
+                out.write("{\"status\":\"success\"}");
+            }else out.write("{\"status\":\"fail\"}");
         }
     }
 }
