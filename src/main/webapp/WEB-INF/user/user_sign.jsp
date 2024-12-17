@@ -78,14 +78,13 @@
     </p>
 
     <form>
-        Chữ ký của bạn <span id="error" style="color: red; font-size: 12px">acb</span><br>
+        Chữ ký của bạn
         <input type="text" name="signature" id="signature" placeholder="Nhập chữ ký của bạn"/><br>
         <div style=" text-align: right">
-            <button id="loadSignature">Xác nhận</button>
+            <span id="errorSign" style="color: red;"></span><br>
+            <button type="submit" id="loadSignature">Xác nhận</button>
         </div>
     </form>
-
-
 </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -112,11 +111,11 @@
                 console.log(response.status);
                 window.location.href = context + "/user/success";
             } else  if (response.status === "failed"){
-                $('#failed').html("Chữ ký của bạn không hợp lệ!");
+                $('#errorSign').html("Chữ ký của bạn không hợp lệ!");
             }
         }
         function handleError() {
-            $('#error').html("Connection errors. Please check your network and try again!");
+            $('#errorSign').html("Connection errors. Please check your network and try again!");
         }
     });
 </script>

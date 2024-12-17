@@ -173,31 +173,14 @@ public class OrderService extends LogDAO<Order> implements IOrderService {
         }
     }
 
-    public static void main(String[] args) {
-        Order order = new Order();
-        User user = new User();
-        user.setId(80);
-        order.setUser(user);
-        DeliveryAddress a = new DeliveryAddress();
-        a.setId(7);
-        order.setAddress(a);
-        ShippingType type = new ShippingType();
-        type.setId(1);
-        order.setType(type);
-        Payment payment = new Payment();
-        payment.setId(1);
-        order.setPayment(payment);
-        Discount discount = new Discount();
-        discount.setId(6);
-        order.setDiscount(discount);
-        order.setNote("mdlfmfd");
-        order.setStatus(new OrderStatus(1, "New", "mkfdmidf"));
-        List<OrderItem> items = new ArrayList<>();
-        items.add(new OrderItem(order, new Product(1), 10, 50000));
-        items.add(new OrderItem(order, new Product(2), 10, 50000));
-        System.out.println(OrderService.getInstance().insertOrders(order, items, "13839443", "djsiijdsdij"));
+    @Override
+    public Map<Order, List<OrderItem>> loadLatestOrderByUser(User user) {
+        try {
+            return OrderDAO.getInstance().loadLatestOrderByUser(user.getId());
+        } catch (Exception e) {
+            return null;
+        }
     }
-
 
     @Override
     public boolean updateOrderStatus(Order order, String ip, String address) {

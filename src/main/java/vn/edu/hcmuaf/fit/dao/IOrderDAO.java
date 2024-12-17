@@ -46,7 +46,7 @@ public interface IOrderDAO extends GenericDAO<Order> {
 
     List<Order> hasDatePayment(Integer orderId);
 
-    public Map<Order, List<OrderItem>> loadLatestOrderByUser(Integer userId);
+    Map<Order, List<OrderItem>> loadLatestOrderByUser(Integer userId);
 
     boolean saveSignature(int order_id, String signature);
 

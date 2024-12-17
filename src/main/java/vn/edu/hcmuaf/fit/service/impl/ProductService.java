@@ -196,5 +196,14 @@ public class ProductService extends LogDAO<Product> implements IProductService {
             return null;
         }
     }
+
+    @Override
+    public Product getProductById(Integer id) {
+        try {
+            return ProductDAO.getInstance().getProductById(id).get(0);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
 

@@ -1,13 +1,9 @@
 package vn.edu.hcmuaf.fit.dao.impl;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import vn.edu.hcmuaf.fit.controller.user_page.Hash;
 import vn.edu.hcmuaf.fit.dao.IOrderDAO;
 import vn.edu.hcmuaf.fit.model.*;
 
 import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -90,14 +86,6 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
         return queryForMap(sql, new OrderItemMapper(), true, userId);
     }
 
-    public static void main(String[] args) throws NoSuchAlgorithmException {
-        Order order = new Order();
-        order.setId(84);
-        Order o = OrderDAO.getInstance().getOrderStatus(order);
-        System.out.println(o.getDateCreated());
-        OrderDAO.getInstance().saveSignature(84,"Sang");
-    }
-
     @Override
     public Order insertOrders(Integer userId, Integer addressId, Integer shipType, Integer discountId, Integer paymentId, String note, Integer statusId) {
         String sql;
@@ -165,9 +153,9 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
     @Override
     public Map<Order, List<OrderItem>> loadLatestOrderByUser(Integer userId) {
         String sql = "SELECT o.*, i.* FROM (" +
-                " SELECT * FROM orders WHERE user_id = ? ORDER BY date_created DESC LIMIT 1" +
+                " SELECT * FROM orders WHERE user_id = ? ORDER BY date_created DESC LIMIT ?" +
                 ") AS o LEFT JOIN order_items i ON o.id = i.order_id";
-        return queryForMap(sql, new OrderItemMapper(), true, userId);
+        return queryForMap(sql, new OrderItemMapper(), true, userId, 1);
     }
 
     @Override

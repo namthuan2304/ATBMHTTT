@@ -124,4 +124,13 @@ public class DeliveryService extends LogDAO<DeliveryAddress> implements IDeliver
             return false;
         }
     }
+
+    @Override
+    public DeliveryAddress getAddressById(Integer id) {
+        try {
+            return DeliveryDAO.getInstance().loadAddressById(id).get(0);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
