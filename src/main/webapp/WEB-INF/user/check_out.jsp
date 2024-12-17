@@ -181,7 +181,7 @@
             </div>
             <span style="color:red; margin-top: 10px;" id="error"></span>
             <div>
-                <button type="submit" id="btn_submit" class="site-btn">Đặt hàng</button>
+              <button type="submit" id="btn_submit" class="site-btn">Đặt hàng</button>
             </div>
             <div>
               <button type="button" id="btn_vnpay" class="site-btn">Thanh toán ngay</button>
@@ -389,7 +389,7 @@
     });
     function handleResponse(response) {
       if (response.status === "success") {
-        window.location.href = context + "/user/success";
+        window.location.href = context + "/user/sign";
       } else if(response.status === "failed") {
         window.location.href = context + "/user/signin";
       } else {

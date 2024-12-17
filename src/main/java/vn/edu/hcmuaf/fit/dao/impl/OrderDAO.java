@@ -1,9 +1,9 @@
 package vn.edu.hcmuaf.fit.dao.impl;
 
 import vn.edu.hcmuaf.fit.dao.IOrderDAO;
-import vn.edu.hcmuaf.fit.model.Order;
-import vn.edu.hcmuaf.fit.model.OrderItem;
+import vn.edu.hcmuaf.fit.model.*;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
@@ -86,14 +86,6 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
         return queryForMap(sql, new OrderItemMapper(), true, userId);
     }
 
-    public static void main(String[] args) {
-        Map<Order, List<OrderItem>> entry = OrderDAO.getInstance().loadOrderProductByUser(80);
-        for (Map.Entry<Order, List<OrderItem>> e : entry.entrySet()) {
-            System.out.println(e.getKey());
-            System.out.println(e.getValue());
-        }
-    }
-
     @Override
     public Order insertOrders(Integer userId, Integer addressId, Integer shipType, Integer discountId, Integer paymentId, String note, Integer statusId) {
         String sql;
@@ -116,8 +108,10 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
 
     @Override
     public boolean updateOrderStatus(Integer orderId, Integer statusId) {
-        String sql = "UPDATE orders SET status_id = ? WHERE id = ?";
-        return update(sql, statusId, orderId);
+        String sql = "UPDATE orders SET status_id = ?, date_created=? WHERE id = ?";
+        Order order = new Order();
+        order.setId(orderId);
+        return update(sql, statusId,this.getOrderStatus(order).getDateCreated(), orderId);
     }
 
     @Override
@@ -155,4 +149,27 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
         String sql = "SELECT * FROM orders WHERE id = ? AND date_payment IS NOT NULL";
         return query(sql, Order.class, orderId);
     }
+
+    @Override
+    public Map<Order, List<OrderItem>> loadLatestOrderByUser(Integer userId) {
+        String sql = "SELECT o.*, i.* FROM (" +
+                " SELECT * FROM orders WHERE user_id = ? ORDER BY date_created DESC LIMIT ?" +
+                ") AS o LEFT JOIN order_items i ON o.id = i.order_id";
+        return queryForMap(sql, new OrderItemMapper(), true, userId, 1);
+    }
+
+    @Override
+    public boolean saveSignature(int order_id, String signature) {
+        // SQL query to update the public_key and keyCreatedDate for the user in the 'users' table
+        String sql = "UPDATE orders SET signature = ?, date_created = ? WHERE id = ? ";
+        // Execute the update and return the result
+        Order order = new Order();
+        order.setId(order_id);
+        return update(sql, signature, this.getOrderStatus(order).getDateCreated(),order_id);
+    }
+
+
+
+
+
 }

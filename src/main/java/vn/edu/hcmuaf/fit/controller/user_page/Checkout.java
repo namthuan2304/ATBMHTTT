@@ -225,7 +225,7 @@ public class Checkout extends HttpServlet {
                     order.setNote("");
 
                     OrderStatus status = new OrderStatus();
-                    status.setId(7);
+                    status.setId(8);
                     order.setStatus(status);
 
                     List<OrderItem> items = new ArrayList<>();
@@ -241,7 +241,7 @@ public class Checkout extends HttpServlet {
                         for (CartItem i : cart) {
                             Map<Product, List<String>> products = ProductService.getInstance().getProductByIdWithSupplierInfo(i.getProduct(), ip, "/user/checkout");
                             for (Product p : products.keySet()) {
-                                items.add(new OrderItem(order, p, p.getPrice(), i.getQuantity()));
+                                items.add(new OrderItem(order, p, i.getQuantity(), p.getPrice()));
                             }
                         }
                     }

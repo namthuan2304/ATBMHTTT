@@ -253,4 +253,10 @@ public class ProductDAO extends AbsDAO<Product> implements IProductDAO {
         String sql = "SELECT * FROM products WHERE quantity = ?";
         return query(sql, Product.class, 0);
     }
+
+    @Override
+    public List<Product> getProductById(Integer id) {
+        String sql = "SELECT * FROM products WHERE id = ?";
+        return query(sql, Product.class, id);
+    }
 }

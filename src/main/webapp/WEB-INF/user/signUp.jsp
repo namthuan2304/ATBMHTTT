@@ -13,6 +13,32 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <title>Đăng ký</title>
     <script type="text/javascript">
+        function togglePassword() {
+            var passwordInput = document.getElementById('password');
+            var toggleIcon = document.getElementById('toggle-password-icon');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+        function toggleRePassword() {
+            var passwordInput = document.getElementById('rePassword');
+            var toggleIcon = document.getElementById('toggle-password-icon1');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
         var context = "${pageContext.request.contextPath}";
         $(document).ready(function() {
             $('#btnRegister').click(function (event) {
@@ -71,11 +97,13 @@
                     <input type="email" id="email-forgot" name="email" placeholder="Email" required>
                 </div>
                 <div id="email-error" style="color: red;"></div>
-                <div class="input-group">
+                <div style="position: relative" class="input-group position-relative">
                     <input id="password" type="password" placeholder="Nhập mật khẩu mới" name="password" required>
+                    <i id="toggle-password-icon" class="fas fa-eye" onclick="togglePassword()" style="cursor: pointer; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);"></i>
                 </div>
-                <div class="input-group">
+                <div style="position: relative" class="input-group">
                     <input id="rePassword" type="password" placeholder="Nhập lại mật khẩu mới" name="rePassword" required>
+                    <i id="toggle-password-icon1" class="fas fa-eye" onclick="toggleRePassword()" style="cursor: pointer; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);"></i>
                 </div>
                 <div class="terms-checkbox">
                     <input type="checkbox" id="agree-terms" name="agree-terms" required>

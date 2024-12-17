@@ -44,4 +44,6 @@ public interface IProductService {
 
     List<Product> getOutOfProducts();
 
+    Product getProductById(Integer id);
+
 }

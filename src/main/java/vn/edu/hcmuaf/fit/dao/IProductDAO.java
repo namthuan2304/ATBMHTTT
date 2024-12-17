@@ -48,4 +48,6 @@ public interface IProductDAO extends GenericDAO<Product> {
     boolean setQuantity(Integer id);
 
     List<Product> getOutOfProducts();
+
+    List<Product> getProductById(Integer id);
 }

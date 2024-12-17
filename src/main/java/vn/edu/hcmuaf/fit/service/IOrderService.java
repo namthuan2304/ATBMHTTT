@@ -27,6 +27,8 @@ public interface IOrderService {
 
     Map<Order, List<OrderItem>> loadOrderNear(Integer limit);
 
+    Map<Order, List<OrderItem>> loadLatestOrderByUser(User user);
+
     boolean updateOrderStatus(Order order, String ip, String address);
 
     boolean deleteOrder(Order order, String ip, String address);
@@ -42,4 +44,6 @@ public interface IOrderService {
     Order getOrderStatus(Order od);
 
     Order hasDatePayment(Order order);
+
+    boolean saveSignature(Order order, String signature, String ip, String address);
 }

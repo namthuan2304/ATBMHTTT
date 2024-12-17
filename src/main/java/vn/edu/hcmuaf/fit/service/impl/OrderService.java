@@ -1,9 +1,6 @@
 package vn.edu.hcmuaf.fit.service.impl;
 
-import vn.edu.hcmuaf.fit.dao.impl.LevelDAO;
-import vn.edu.hcmuaf.fit.dao.impl.LogDAO;
-import vn.edu.hcmuaf.fit.dao.impl.OrderDAO;
-import vn.edu.hcmuaf.fit.dao.impl.OrderItemDAO;
+import vn.edu.hcmuaf.fit.dao.impl.*;
 import vn.edu.hcmuaf.fit.model.*;
 import vn.edu.hcmuaf.fit.service.IOrderService;
 
@@ -122,6 +119,37 @@ public class OrderService extends LogDAO<Order> implements IOrderService {
     }
 
     @Override
+    public boolean saveSignature(Order order, String signature, String ip, String address) {
+        try {
+            // Lưu trạng thái trước khi thực hiện cập nhật
+            order.setBeforeData("User with ID=" + order.getId() + " has no public key or existing key is being replaced.");
+
+            // Thực hiện lưu chữ ký
+            boolean success = OrderDAO.getInstance().saveSignature(order.getId(), signature);
+
+            // Ghi nhận trạng thái sau khi thực hiện
+            if (success) {
+                order.setAfterData("Signature saved successfully for order ID=" + order.getId());
+            } else {
+                order.setAfterData("Failed to save signature for order ID=" + order.getId());
+            }
+
+            // Ghi log hoạt động
+            Level logLevel = success
+                    ? LevelDAO.getInstance().getLevel(1).get(0) // Level success
+                    : LevelDAO.getInstance().getLevel(2).get(0); // Level error
+            super.insert(order, logLevel, ip, address);
+
+            return success;
+        } catch (Exception e) {
+            // Xử lý ngoại lệ và ghi log lỗi
+            order.setAfterData("Error saving signature for order ID=" + order.getId() + ": " + e.getMessage());
+            super.insert(order, LevelDAO.getInstance().getLevel(2).get(0), ip, address);
+            return false;
+        }
+    }
+
+    @Override
     public Map<Order, List<OrderItem>> insertOrders(Order order, List<OrderItem> orderItems, String ip, String address) {
         Map<Order, List<OrderItem>> re = new HashMap<>();
         try {
@@ -145,31 +173,14 @@ public class OrderService extends LogDAO<Order> implements IOrderService {
         }
     }
 
-    public static void main(String[] args) {
-        Order order = new Order();
-        User user = new User();
-        user.setId(80);
-        order.setUser(user);
-        DeliveryAddress a = new DeliveryAddress();
-        a.setId(7);
-        order.setAddress(a);
-        ShippingType type = new ShippingType();
-        type.setId(1);
-        order.setType(type);
-        Payment payment = new Payment();
-        payment.setId(1);
-        order.setPayment(payment);
-        Discount discount = new Discount();
-        discount.setId(6);
-        order.setDiscount(discount);
-        order.setNote("mdlfmfd");
-        order.setStatus(new OrderStatus(1, "New", "mkfdmidf"));
-        List<OrderItem> items = new ArrayList<>();
-        items.add(new OrderItem(order, new Product(1), 10, 50000));
-        items.add(new OrderItem(order, new Product(2), 10, 50000));
-        System.out.println(OrderService.getInstance().insertOrders(order, items, "13839443", "djsiijdsdij"));
+    @Override
+    public Map<Order, List<OrderItem>> loadLatestOrderByUser(User user) {
+        try {
+            return OrderDAO.getInstance().loadLatestOrderByUser(user.getId());
+        } catch (Exception e) {
+            return null;
+        }
     }
-
 
     @Override
     public boolean updateOrderStatus(Order order, String ip, String address) {
