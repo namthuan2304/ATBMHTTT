@@ -19,6 +19,7 @@ import vn.edu.hcmuaf.fit.service.impl.OrderService;
 import vn.edu.hcmuaf.fit.service.impl.ProductService;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -129,7 +130,7 @@ public class UserSign extends HttpServlet {
         User user = (User) session.getAttribute("auth");
         String sign = request.getParameter("signature");
         JsonObject root = new JsonObject();
-
+        PrintWriter out = response.getWriter();
         if (user == null) request.getRequestDispatcher("/WEB-INF/user/signIn.jsp").forward(request, response);
         else {
             VerifySign verifySign = new VerifySign();
@@ -216,19 +217,23 @@ public class UserSign extends HttpServlet {
                                 order.setStatus(orderStatus);
                                 boolean success = OrderService.getInstance().updateOrderStatus(order, ip, "user/sign");
                                 if (success) {
-                                    response.getWriter().write("{ \"status\": \"success\"}");
-                                } else response.getWriter().write("{ \"status\": \"failed\"}");
+                                    System.out.println("success");
+                                   out.write("{ \"check\": \"success\"}");
+                                } else out.write("{ \"check\": \"failed\"}");
                             }
                         } else {
                             System.out.println("failed");
-                            response.getWriter().write("{ \"status\": \"error\"}");
+                            out.write("{ \"check\": \"error\"}");
                         }
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    out.close();
                 } else request.getRequestDispatcher("/WEB-INF/user/index.jsp").forward(request, response);
+
             }
+
         }
     }
 }

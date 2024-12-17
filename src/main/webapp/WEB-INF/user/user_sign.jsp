@@ -379,11 +379,12 @@
             });
         });
         function handleResponse(response) {
-            if (response.status === "success") {
-                console.log(response.status);
+            if (response.check === "success") {
+                console.log(response.check);
                 window.location.href = context + "/user/success";
-            } else  if (response.status === "failed"){
+            } else{
                 $('#errorSign').html("Chữ ký của bạn không hợp lệ!");
+                console.log(response.check);
             }
         }
         function handleError() {

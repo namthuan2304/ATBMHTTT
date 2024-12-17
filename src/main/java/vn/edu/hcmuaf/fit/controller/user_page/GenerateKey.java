@@ -23,25 +23,29 @@ public class GenerateKey extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=UTF-8");
+        String action = request.getParameter("action");
+        if(action != null && action.equals("changeKey")) {
 
-        // Kiểm tra session
-        HttpSession session = request.getSession(false); // Không tạo session mới
-        User user = (session != null) ? (User) session.getAttribute("auth") : null;
+        }else{
+            // Kiểm tra session
+            HttpSession session = request.getSession(false); // Không tạo session mới
+            User user = (session != null) ? (User) session.getAttribute("auth") : null;
 
-        if (user == null) {
-            // Nếu người dùng chưa đăng nhập, chuyển hướng đến trang đăng nhập
-            response.sendRedirect("/user/signin");
-            return;
+            if (user == null) {
+                // Nếu người dùng chưa đăng nhập, chuyển hướng đến trang đăng nhập
+                response.sendRedirect("/user/signin");
+                return;
+            }
+
+            // Nếu người dùng đã đăng nhập nhưng chưa có public key, forward đến generateKey.jsp
+            if (user.getPublicKey() == null || user.getPublicKey().isEmpty()) {
+                request.getRequestDispatcher("/WEB-INF/user/generateKey.jsp").forward(request, response);
+                return;
+            }
+
+            // Nếu đã có public key, chuyển hướng về trang chủ hoặc xử lý khác
+            response.sendRedirect("/user/home");
         }
-
-        // Nếu người dùng đã đăng nhập nhưng chưa có public key, forward đến generateKey.jsp
-        if (user.getPublicKey() == null || user.getPublicKey().isEmpty()) {
-            request.getRequestDispatcher("/WEB-INF/user/generateKey.jsp").forward(request, response);
-            return;
-        }
-
-        // Nếu đã có public key, chuyển hướng về trang chủ hoặc xử lý khác
-        response.sendRedirect("/user/home");
     }
 
 
@@ -142,6 +146,16 @@ public class GenerateKey extends HttpServlet {
             zipOutputStream.flush();
         }
     }
-
+    private void sendPrivateKeyAsFile(HttpServletResponse response, String privateKey, String userEmail) throws IOException {
+        String fileName = userEmail + "_private_key.pem";
+        byte[] privateKeyBytes = privateKey.getBytes("UTF-8");
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        response.setContentLength(privateKeyBytes.length);
+        try (ServletOutputStream outputStream = response.getOutputStream()) {
+            outputStream.write(privateKeyBytes);
+            outputStream.flush();
+        }
+    }
 
 }

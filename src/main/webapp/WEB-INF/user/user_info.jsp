@@ -533,10 +533,12 @@
 
                         <!-- Nút Tạo Cặp Khóa Mới -->
 
+    <span id="errorKey" style="color: red"></span> <br>
+    <div id="createKeyPairButton" onclick="" style="display: inline-block;margin-top: 20px" class="voltage-button">
 
-    <div id="createKeyPairButton" onclick="createKeyPair()" style="display: inline-block;margin-top: 20px" class="voltage-button">
-
-        <button>Tạo Cặp Khóa Mới</button>
+        <form >
+            <input type="hidden" value="change" id="keyAction">
+            <button id="btnKey">Tạo Cặp Khóa Mới</button></form>
         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 234.6 61.3" preserveAspectRatio="none" xml:space="preserve">
 
     <filter id="glow">
@@ -810,6 +812,37 @@
                 },
                 error: function() {
                     $('#errorReset').html("Connection errors. Please check your network and try again!");
+                }
+            });
+        });
+    });
+</script>
+<script>
+    var context = "${pageContext.request.contextPath}";
+    $(document).ready(function() {
+        $('#btnKey').click(function (event) {
+            var action = $('#keyAction').val();
+            $.ajax({
+                type: 'POST',
+                data: {
+                    action: action
+                },
+                url: 'updateinfouser',
+                success: function (result) {
+                    try {
+                        if (result.status !== "success") {
+                            document.getElementById("errorKey").style.color = "red";
+                            $('#errorKey').html(result.error);
+                        } else {
+                            document.getElementById("errorKey").style.color = "green";
+                            $('#errorKey').html("email da dc gui thanh cong");
+                        }
+                    } catch (e) {
+                        $('#errorKey').html("Error loading request, please try again!");
+                    }
+                },
+                error: function() {
+                    $('#errorKey').html("Connection errors. Please check your network and try again!");
                 }
             });
         });
