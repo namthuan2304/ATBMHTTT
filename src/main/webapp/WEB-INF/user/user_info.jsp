@@ -371,21 +371,8 @@
                             %>
                         </div>
                     </div>
-                    <!-- Tab "Tạo lại Cặp Khóa Mới" -->
-                    <div class="tab-pane" id="createKeyPairLost">
-                        <header>
-                            <h1>Tạo lại Cặp Khóa Mới</h1>
-                            <div class="content">Bạn đã báo mất khóa. Hãy tạo lại một cặp khóa mới để bảo mật tài khoản của bạn.</div>
-                        </header>
-
-                        <!-- Nút Tạo lại Cặp Khóa Mới -->
-                        <button id="createKeyPairLostButton" class="btn btn-danger" onclick="createKeyPairLost()">Tạo lại Cặp Khóa Mới</button>
-                    </div>
-
-
                 </div>
-
-
+            </div>
                 <div class="col-lg-4 order-lg-1 text-center img-2">
                     <div class="img-ava">
                         <img src="${sessionScope.auth.avatar}" class="mx-auto img-fluid img-circle d-block" id="avatar" style="border-radius: 1px">
@@ -677,86 +664,6 @@
         }
     </script>
 
-        <script>
-            // Hàm xử lý khi người dùng nhấn vào nút "Tạo lại Cặp Khóa Mới"
-            function createKeyPairLost() {
-                // Disable nút để tránh gửi nhiều yêu cầu
-                document.getElementById('createKeyPairLostButton').disabled = true;
-
-                // Gửi yêu cầu tạo cặp khóa mới tới backend
-                fetch('/user/generateKeyLost', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        // Có thể thêm các tham số nếu cần thiết
-                    })
-                })
-                    .then(response => response.json())  // Xử lý phản hồi dưới dạng JSON
-                    .then(data => {
-                        if (data.status === 'success') {
-                            // Hiển thị thông báo thành công
-                            alert('Cặp khóa mới đã được tạo thành công!');
-
-                            // Tự động tải private key khi cặp khóa được tạo thành công
-                            downloadPrivateKey();
-                        } else {
-                            // Nếu có lỗi, hiển thị thông báo lỗi
-                            alert('Đã xảy ra lỗi khi tạo cặp khóa. Vui lòng thử lại.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Đã xảy ra lỗi. Vui lòng thử lại.');
-                    })
-                    .finally(() => {
-                        // Bật lại nút sau khi xử lý xong
-                        document.getElementById('createKeyPairLostButton').disabled = false;
-                    });
-            }
-
-            // Hàm tải private key từ server
-            function downloadPrivateKey() {
-                fetch('/user/generateKeyLost?download=true', {
-                    method: 'POST', // POST request vì chúng ta đang yêu cầu tải file
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    }
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            // Lấy tên file từ header Content-Disposition
-                            const contentDisposition = response.headers.get('Content-Disposition');
-                            const fileNameMatch = contentDisposition && contentDisposition.match(/filename="(.+)"/);
-                            const fileName = fileNameMatch ? fileNameMatch[1] : 'private_key.pem'; // Nếu không có tên file, đặt tên mặc định
-
-                            // Chuyển phản hồi thành blob (file)
-                            return response.blob().then(blob => ({ blob, fileName }));
-                        } else {
-                            throw new Error('Lỗi khi tải private key.');
-                        }
-                    })
-                    .then(({ blob, fileName }) => {
-                        // Tạo một URL từ blob và tải xuống file
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.style.display = 'none';
-                        a.href = url;
-                        a.download = fileName; // Sử dụng tên file lấy từ header
-                        document.body.appendChild(a);
-                        a.click();
-                        window.URL.revokeObjectURL(url); // Xóa URL sau khi tải xong
-
-                        // Thông báo thành công
-                        alert('Private key đã được tải xuống thành công!');
-                    })
-                    .catch(error => {
-                        console.error('Error downloading private key:', error);
-                        alert('Đã xảy ra lỗi khi tải private key.');
-                    });
-            }
-        </script>
 
 
 </body>
