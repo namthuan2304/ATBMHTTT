@@ -581,7 +581,7 @@
 
             <div class="col-lg-4 order-lg-1 text-center img-2">
                 <div class="img-ava">
-                    <img src="${sessionScope.auth.avatar}" class="mx-auto img-fluid img-circle d-block" id="avatar" style="border-radius: 1px">
+                    <img src="${empty sessionScope.auth.avatar ? '/uploads/default.png' : sessionScope.auth.avatar}" class="mx-auto img-fluid img-circle d-block" id="avatar" style="border-radius: 1px">
                     <label class="load-ava">
                         <span class="custom-file-control">Đổi Ảnh</span>
                         <input type="file" id="file" class="custom-file-input">

@@ -1,5 +1,9 @@
 package vn.edu.hcmuaf.fit.controller.user_page;
 
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.layout.element.Image;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -30,8 +34,12 @@ public class ExportInvoice extends HttpServlet {
             Order order = new Order();
             order.setId(orderId);
             Map<Order, List<OrderItem>> map = OrderService.getInstance().loadOrderProductByOrder(order);
+            ServletContext servletContext = request.getServletContext();
+            String imagePath = servletContext.getRealPath("/assets/user/img/formIcon/icon-logo.png");
+            ImageData data = ImageDataFactory.create(imagePath);
+            Image img = new Image(data);
             for(Map.Entry<Order, List<OrderItem>> entry : map.entrySet()) {
-                GeneratePdf.generateInvoice(entry.getKey(), entry.getValue(), ip, address, response.getOutputStream());
+                GeneratePdf.generateInvoice(entry.getKey(), entry.getValue(), img, ip, address, response.getOutputStream());
             }
         }
     }
