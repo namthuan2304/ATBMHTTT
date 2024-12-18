@@ -1,6 +1,5 @@
 package vn.edu.hcmuaf.fit.model;
 
-import com.itextpdf.io.font.FontConstants;
 import com.itextpdf.kernel.color.Color;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
@@ -12,7 +11,6 @@ import com.itextpdf.layout.border.Border;
 import com.itextpdf.layout.border.DashedBorder;
 import com.itextpdf.layout.border.SolidBorder;
 import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
@@ -27,24 +25,29 @@ import java.util.List;
 import java.util.Map;
 
 public class GeneratePdf {
-    public static final String vuArial = "fonts\\vuArial.ttf";
-    public static final String vuArialBold = "fonts\\vuArialBold.ttf";
-    public static final String vuArialBoldItalic = "fonts\\vuArialBoldItalic.ttf";
-    public static final String vuArialItalic = "fonts\\vuArialItalic.ttf";
-    public static final String vuTimes = "fonts\\vuTimes.ttf";
-    public static final String vuTimesBold = "fonts\\vuTimesBold.ttf";
-    public static final String vuTimesBoldItalic = "fonts\\vuTimesBoldItalic.ttf";
-    public static final String vuTimesItalic = "fonts\\vuTimesItalic.ttf";
+//    public static final String vuArial = "fonts\\vuArial.ttf";
+//    public static final String vuArialBold = "fonts\\vuArialBold.ttf";
+//    public static final String vuArialBoldItalic = "fonts\\vuArialBoldItalic.ttf";
+//    public static final String vuArialItalic = "fonts\\vuArialItalic.ttf";
+//    public static final String vuTimes = "fonts\\vuTimes.ttf";
+//    public static final String vuTimesBold = "fonts\\vuTimesBold.ttf";
+//    public static final String vuTimesBoldItalic = "fonts\\vuTimesBoldItalic.ttf";
+//    public static final String vuTimesItalic = "fonts\\vuTimesItalic.ttf";
 
-    public static void generateInvoice(Order order, List<OrderItem> item, Image img, String ip, String addressLink, OutputStream outputStream) throws IOException {
+    public static void generateInvoice(Order order, List<OrderItem> item, String font, String ip, String addressLink, OutputStream outputStream) throws IOException {
         PdfWriter writer = new PdfWriter(outputStream);
         PdfDocument pdfDocument = new PdfDocument(writer);
         pdfDocument.setDefaultPageSize(PageSize.A4);
         Document document = new Document(pdfDocument);
 
-        PdfFont font = PdfFontFactory.createFont(FontConstants.TIMES_ROMAN);
-        PdfFont boldFont = PdfFontFactory.createFont(FontConstants.TIMES_BOLD);
-
+        PdfFont vuArial1 = PdfFontFactory.createFont(font, true);
+//        PdfFont vuArialBold1 = PdfFontFactory.createFont(vuArialBold, true);
+//        PdfFont vuArialBoldItalic1 = PdfFontFactory.createFont(vuArialBoldItalic, true);
+//        PdfFont vuArialItalic1 = PdfFontFactory.createFont(vuArialItalic, true);
+//        PdfFont vuTimes1 = PdfFontFactory.createFont(vuTimes, true);
+//        PdfFont vuTimesBold1 = PdfFontFactory.createFont(vuTimesBold, true);
+//        PdfFont vuTimesBoldItalic1 = PdfFontFactory.createFont(vuTimesBoldItalic, true);
+//        PdfFont vuTimesItalic1 = PdfFontFactory.createFont(vuTimesItalic, true);
 
         DeliveryAddress address = DeliveryService.getInstance().loadAddressByOrder(order);
 
@@ -57,11 +60,11 @@ public class GeneratePdf {
         Paragraph onesp = new Paragraph("\n");
 
         Table table = new Table(twocolumnWidth);
-        table.addCell(new Cell().add("HOÁ ĐƠN").setFontSize(20f).setBorder(Border.NO_BORDER).setFont(boldFont));
+        table.addCell(new Cell().add("HOÁ ĐƠN").setFontSize(20f).setBorder(Border.NO_BORDER).setFont(vuArial1));
         Table nestedTable = new Table(new float[]{twocols/2, twocols/2});
-        nestedTable.addCell(getHeaderTextCell("Invoice No.").setFont(boldFont));
+        nestedTable.addCell(getHeaderTextCell("Invoice No.").setFont(vuArial1));
         nestedTable.addCell(getHeaderTextCellValue(order.getId()+ ""));
-        nestedTable.addCell(getHeaderTextCell("Invoice Datetime").setFont(boldFont));
+        nestedTable.addCell(getHeaderTextCell("Invoice Datetime").setFont(vuArial1));
         nestedTable.addCell(getHeaderTextCellValue(Utils.convertDateFormat(order.getDateCreated())));
 
         table.addCell(new Cell().add(nestedTable).setBorder(Border.NO_BORDER));
@@ -105,14 +108,14 @@ public class GeneratePdf {
         Border dgb = new DashedBorder(Color.GRAY, 0.5f);
         document.add(tableDivider2.setBorder(dgb));
         Paragraph productPara = new Paragraph("Products");
-        document.add(productPara.setFont(boldFont));
+        document.add(productPara.setFont(vuArial1));
 
         Table threeColTable1 = new Table(threeColumnWidth);
         threeColTable1.setBackgroundColor(Color.GRAY, 0.7f);
 
-        threeColTable1.addCell(new Cell().add("Description").setFont(boldFont).setFontColor(Color.WHITE).setBorder(Border.NO_BORDER));
-        threeColTable1.addCell(new Cell().add("Quantity").setFont(boldFont).setFontColor(Color.WHITE).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
-        threeColTable1.addCell(new Cell().add("Price").setFont(boldFont).setFontColor(Color.WHITE).setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER).setMarginRight(15f));
+        threeColTable1.addCell(new Cell().add("Description").setFont(vuArial1).setFontColor(Color.WHITE).setBorder(Border.NO_BORDER));
+        threeColTable1.addCell(new Cell().add("Quantity").setFont(vuArial1).setFontColor(Color.WHITE).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
+        threeColTable1.addCell(new Cell().add("Price").setFont(vuArial1).setFontColor(Color.WHITE).setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER).setMarginRight(15f));
         document.add(threeColTable1);
         Table threeColTable2 = new Table(threeColumnWidth);
         float totalSum = 0f;
@@ -165,7 +168,7 @@ public class GeneratePdf {
         document.add(divider.setBorder(new SolidBorder(Color.GRAY, 1)).setMarginBottom(15f));
 
         Table tb = new Table(fullwidth);
-        tb.addCell(new Cell().add("TERMS AND CONDITIONS\n").setFont(boldFont).setBorder(Border.NO_BORDER));
+        tb.addCell(new Cell().add("TERMS AND CONDITIONS\n").setFont(vuArial1).setBorder(Border.NO_BORDER));
         List<String> TncList = new ArrayList<>();
         TncList.add("1. This Agreement shall be governed by and construed in accordance with the laws of the Republic of Vietnam, without regard to its conflict of laws provisions.");
         TncList.add("2. The parties hereto agree that this Agreement shall be binding upon and inure to the benefit of the parties and their respective successors, assigns, and permitted assigns.");
@@ -194,4 +197,9 @@ public class GeneratePdf {
         return isBold?cell.setBold():cell;
     }
 
+
+    public static void main(String[] args) {
+        String path = "D:\\Font.pdf";
+
+    }
 }
