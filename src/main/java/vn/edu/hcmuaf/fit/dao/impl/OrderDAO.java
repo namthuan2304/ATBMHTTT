@@ -108,7 +108,7 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
 
     @Override
     public boolean updateOrderStatus(Integer orderId, Integer statusId) {
-        String sql = "UPDATE orders SET status_id = ?, date_created=? WHERE id = ?";
+        String sql = "UPDATE orders SET status_id = ?, date_created= ? WHERE id = ?";
         Order order = new Order();
         order.setId(orderId);
         return update(sql, statusId,this.getOrderStatus(order).getDateCreated(), orderId);

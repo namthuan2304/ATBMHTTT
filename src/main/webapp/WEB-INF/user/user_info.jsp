@@ -532,8 +532,6 @@
                         </header>
 
                         <!-- Nút Tạo Cặp Khóa Mới -->
-
-    <span id="errorKey" style="color: red"></span> <br>
     <div id="createKeyPairButton" onclick="" style="display: inline-block;margin-top: 20px" class="voltage-button">
 
         <form >
@@ -817,32 +815,34 @@
         });
     });
 </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     var context = "${pageContext.request.contextPath}";
     $(document).ready(function() {
         $('#btnKey').click(function (event) {
+            event.preventDefault();
             var action = $('#keyAction').val();
+            console.log(action)
             $.ajax({
                 type: 'POST',
                 data: {
                     action: action
                 },
                 url: 'updateinfouser',
+                dataType: 'json',
                 success: function (result) {
                     try {
-                        if (result.status !== "success") {
-                            document.getElementById("errorKey").style.color = "red";
-                            $('#errorKey').html(result.error);
+                        if (result.status === "success") {
+                            alert("Link xác thực tạo khoá mới đã được gửi về mail của bạn!")
                         } else {
-                            document.getElementById("errorKey").style.color = "green";
-                            $('#errorKey').html("email da dc gui thanh cong");
+                            alert("Error 1!")
                         }
                     } catch (e) {
-                        $('#errorKey').html("Error loading request, please try again!");
+                        alert("Error 2!")
                     }
                 },
                 error: function() {
-                    $('#errorKey').html("Connection errors. Please check your network and try again!");
+                    alert("Error 3!")
                 }
             });
         });

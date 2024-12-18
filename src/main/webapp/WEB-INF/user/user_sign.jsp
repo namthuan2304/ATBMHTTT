@@ -303,7 +303,7 @@
             <span class="left" />
         </div>
         <div style=" text-align: center">
-            <span id="errorSign" style="color: red;"></span><br>
+            <span id="errorSign" style="color: red; background-color: white"></span><br>
             <div style="display: flex;justify-content: center">
                 <button class="button" type="submit" id="loadSignature">
                     <span style="background-color: transparent">Xác nhận</span>
@@ -323,43 +323,14 @@
         // Handle the copy functionality
         $('#copyButton').click(function(event) {
             event.preventDefault();
-            var hashText = $('p').text().trim(); // Lấy nội dung của thẻ <p>
+            var hashText = $('p').text().trim();
 
-            // Sao chép văn bản vào clipboard
             navigator.clipboard.writeText(hashText.trim().replace("COPY","").trim()).then(function() {
-                console.log("Text successfully copied to clipboard!");
                 alert("Mã Hash đã được sao chép vào clipboard!");
-            }).catch(function(err) {
-                console.error("Error copying text: ", err);
+            }).catch(function() {
                 alert("Có lỗi xảy ra khi sao chép!");
             });
         });
-
-        // Handle the signature form submission
-        $('#loadSignature').click(function (event) {
-            event.preventDefault();
-            var signature = $('#signature').val();
-            $.ajax({
-                type: 'POST',
-                data: { signature: signature },
-                url: context + '/user/sign',
-                success: handleResponse,
-                error: handleError
-            });
-        });
-
-        function handleResponse(response) {
-            if (response.status === "success") {
-                console.log(response.status);
-                window.location.href = context + "/user/success";
-            } else  if (response.status === "failed"){
-                $('#errorSign').html("Chữ ký của bạn không hợp lệ!");
-            }
-        }
-
-        function handleError() {
-            $('#errorSign').html("Connection errors. Please check your network and try again!");
-        }
     });
 </script>
 <script>
@@ -373,23 +344,26 @@
                 data: {
                     signature: signature,
                 },
-                url: context + '/user/sign',
-                success: handleResponse,
-                error: handleError
+                url: 'sign',
+                success: function (result) {
+                    try {
+                        console.log(result.status);
+                        if (result.status === "success") {
+                            window.location.href = context + "/user/success";
+                        } else if (result.status === "empty") {
+                            $('#errorSign').html("Vui lòng nhập chữ ký!");
+                        } else {
+                            $('#errorSign').html("Chữ ký của bạn không hợp lệ!");
+                        }
+                    } catch (e) {
+                        $('#errorSign').html("Error loading request, please try again!");
+                    }
+                },
+                error: function() {
+                    $('#errorSign').html("Chữ ký của bạn không đúng định dạng!");
+                }
             });
         });
-        function handleResponse(response) {
-            if (response.check === "success") {
-                console.log(response.check);
-                window.location.href = context + "/user/success";
-            } else{
-                $('#errorSign').html("Chữ ký của bạn không hợp lệ!");
-                console.log(response.check);
-            }
-        }
-        function handleError() {
-            $('#errorSign').html("Connection errors. Please check your network and try again!");
-        }
     });
 </script>
 </html>

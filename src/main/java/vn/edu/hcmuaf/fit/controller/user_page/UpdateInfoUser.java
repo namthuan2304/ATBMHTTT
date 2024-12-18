@@ -170,17 +170,18 @@ public class UpdateInfoUser extends HttpServlet {
                     } else out.write("{ \"error\" :\"update fail!\"}");
                 }
             }
-            out.flush();
-            out.close();
         } else if (action.equals("change")) {
             SendEmail sendEmail = new SendEmail();
             String link = "http://localhost:8080/user/generateKeyLost?download=true";
-
             if (sendEmail.sendLinkKey(user.getEmail(), link)) {
                 session.setAttribute("linkKey", link);
-                session.setAttribute("linkKeyExpiry", System.currentTimeMillis() + 30000); // Hết hạn sau 30 giây
-                out.write("{\"status\":\"success\"}");
-            } else out.write("{\"status\":\"fail\"}");
+                session.setAttribute("linkKeyExpiry", System.currentTimeMillis() + 30000);
+                System.out.println("odforfkf");
+            }
+            System.out.println("ds;kfdopkfdkfdpk");
+            out.write("{ \"status\": \"success\"}");
         }
+        out.flush();
+        out.close();
     }
 }
