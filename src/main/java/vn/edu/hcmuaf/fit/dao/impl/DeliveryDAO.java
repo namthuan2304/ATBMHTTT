@@ -40,15 +40,15 @@ public class DeliveryDAO extends AbsDAO<DeliveryAddress> implements IDeliveryDAO
     }
 
     @Override
-    public DeliveryAddress addDeliveryAddress(Integer userId, String fullName, String phone, String province, String district, String ward, String detailAddress, Boolean atHome, Boolean primary) {
-        String sql = "INSERT INTO `delivery_address`(`user_id`, `full_name`, `phone`, `province`, `district`, `ward`, `detail_address`, `at_home`, `primary`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        return insert(sql, DeliveryAddress.class, userId, fullName, phone, province, district, ward, detailAddress, atHome?1:0, primary?1:0);
+    public DeliveryAddress addDeliveryAddress(Integer userId, String fullName, String phone, String province, String district, String ward, String detailAddress) {
+        String sql = "INSERT INTO `delivery_address`(`user_id`, `full_name`, `phone`, `province`, `district`, `ward`, `detail_address`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        return insert(sql, DeliveryAddress.class, userId, fullName, phone, province, district, ward, detailAddress);
     }
 
     @Override
-    public boolean updateDeliveryAddress(Integer userId, Integer addressId, String fullName, String phone, String province, String district, String ward, String detailAddress, Boolean atHome, Boolean primary) {
-        String sql = "UPDATE delivery_address SET full_name = ?, phone = ?, province = ?, district = ?, ward = ?, detail_address = ?, at_home = ?, primary = ? WHERE user_id = ? AND id = ?";
-        return update(sql, fullName, phone, province, district, ward, detailAddress, atHome?1:0, primary?1:0, userId, addressId);
+    public boolean updateDeliveryAddress(Integer userId, Integer addressId, String fullName, String phone, String province, String district, String ward, String detailAddress) {
+        String sql = "UPDATE delivery_address SET full_name = ?, phone = ?, province = ?, district = ?, ward = ?, detail_address = ? WHERE user_id = ? AND id = ?";
+        return update(sql, fullName, phone, province, district, ward, detailAddress, userId, addressId);
     }
 
     @Override

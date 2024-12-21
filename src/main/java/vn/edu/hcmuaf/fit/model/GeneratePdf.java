@@ -1,6 +1,8 @@
 package vn.edu.hcmuaf.fit.model;
 
+import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.kernel.color.Color;
+import com.itextpdf.kernel.color.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
@@ -13,9 +15,12 @@ import com.itextpdf.layout.border.SolidBorder;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.property.VerticalAlignment;
 import vn.edu.hcmuaf.fit.service.impl.DeliveryService;
 import vn.edu.hcmuaf.fit.service.impl.OrderService;
+import vn.edu.hcmuaf.fit.service.impl.OrderStatusService;
 import vn.edu.hcmuaf.fit.service.impl.ProductService;
 
 import java.io.IOException;
@@ -25,97 +30,111 @@ import java.util.List;
 import java.util.Map;
 
 public class GeneratePdf {
-//    public static final String vuArial = "fonts\\vuArial.ttf";
-//    public static final String vuArialBold = "fonts\\vuArialBold.ttf";
-//    public static final String vuArialBoldItalic = "fonts\\vuArialBoldItalic.ttf";
-//    public static final String vuArialItalic = "fonts\\vuArialItalic.ttf";
-//    public static final String vuTimes = "fonts\\vuTimes.ttf";
-//    public static final String vuTimesBold = "fonts\\vuTimesBold.ttf";
-//    public static final String vuTimesBoldItalic = "fonts\\vuTimesBoldItalic.ttf";
-//    public static final String vuTimesItalic = "fonts\\vuTimesItalic.ttf";
+    public static final String fontPath = "src/main/resources/fonts/";
+    public static final String vuArialFont = "vuArial.ttf";
+    public static final String vuArialBoldFont = "vuArialBold.ttf";
+    public static final String vuArialBoldItalicFont = "vuArialBoldItalic.ttf";
+    public static final String vuArialItalicFont = "vuArialItalic.ttf";
 
-    public static void generateInvoice(Order order, List<OrderItem> item, String font, String ip, String addressLink, OutputStream outputStream) throws IOException {
+    public static void generateInvoice(Order order, List<OrderItem> item, String ip, String addressLink, OutputStream outputStream) throws IOException {
+
         PdfWriter writer = new PdfWriter(outputStream);
         PdfDocument pdfDocument = new PdfDocument(writer);
         pdfDocument.setDefaultPageSize(PageSize.A4);
         Document document = new Document(pdfDocument);
 
-        PdfFont vuArial1 = PdfFontFactory.createFont(font, true);
-//        PdfFont vuArialBold1 = PdfFontFactory.createFont(vuArialBold, true);
-//        PdfFont vuArialBoldItalic1 = PdfFontFactory.createFont(vuArialBoldItalic, true);
-//        PdfFont vuArialItalic1 = PdfFontFactory.createFont(vuArialItalic, true);
-//        PdfFont vuTimes1 = PdfFontFactory.createFont(vuTimes, true);
-//        PdfFont vuTimesBold1 = PdfFontFactory.createFont(vuTimesBold, true);
-//        PdfFont vuTimesBoldItalic1 = PdfFontFactory.createFont(vuTimesBoldItalic, true);
-//        PdfFont vuTimesItalic1 = PdfFontFactory.createFont(vuTimesItalic, true);
+        PdfFont vuArial = PdfFontFactory.createFont(fontPath + vuArialFont, PdfEncodings.IDENTITY_H, true);
+        PdfFont vuArialBold = PdfFontFactory.createFont(fontPath + vuArialBoldFont, PdfEncodings.IDENTITY_H, true);
+        PdfFont vuArialBoldItalic = PdfFontFactory.createFont(fontPath + vuArialBoldItalicFont, PdfEncodings.IDENTITY_H, true);
+        PdfFont vuArialItalic = PdfFontFactory.createFont(fontPath + vuArialItalicFont, PdfEncodings.IDENTITY_H, true);
 
         DeliveryAddress address = DeliveryService.getInstance().loadAddressByOrder(order);
+        OrderStatus status = OrderStatusService.getInstance().getStatusById(order.getStatus());
 
         float threecol = 190f;
         float twocols = 285f;
-        float twocols150 = twocols + 150f;
-        float twocolumnWidth[] = {twocols150, twocols};
+        float twocols80 = twocols + 80f;
+        float[] twocolumnWidth = {twocols80, twocols};
         float threeColumnWidth[] = {threecol, threecol, threecol};
         float fullwidth[] = {threecol*3};
         Paragraph onesp = new Paragraph("\n");
 
+        // Tao phan hoa don va thong tin hoa don
         Table table = new Table(twocolumnWidth);
-        table.addCell(new Cell().add("HOÁ ĐƠN").setFontSize(20f).setBorder(Border.NO_BORDER).setFont(vuArial1));
-        Table nestedTable = new Table(new float[]{twocols/2, twocols/2});
-        nestedTable.addCell(getHeaderTextCell("Invoice No.").setFont(vuArial1));
-        nestedTable.addCell(getHeaderTextCellValue(order.getId()+ ""));
-        nestedTable.addCell(getHeaderTextCell("Invoice Datetime").setFont(vuArial1));
-        nestedTable.addCell(getHeaderTextCellValue(Utils.convertDateFormat(order.getDateCreated())));
+        table.setBackgroundColor(new DeviceRgb(63, 169, 219)).setFontColor(Color.WHITE);
+        table.addCell(new Cell().add("HOÁ ĐƠN").setFontSize(30f).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setFont(vuArialBold).setTextAlignment(TextAlignment.CENTER).setMarginBottom(30f).setMarginTop(30f));
+
+        Table nestedTable = new Table(new float[]{twocols * 0.4f, twocols * 0.6f});
+        nestedTable.setMarginBottom(30f).setMarginTop(30f).setVerticalAlignment(VerticalAlignment.MIDDLE);
+        nestedTable.addCell(new Cell().add("Số hoá đơn:").setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE).setFont(vuArialBold));
+        nestedTable.addCell(new Cell().add(order.getId()+ "").setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE).setFont(vuArialItalic));
+        nestedTable.addCell(new Cell().add("Thời gian tạo:").setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE).setFont(vuArialBold));
+        nestedTable.addCell(new Cell().add(Utils.convertDateFormat(order.getDateCreated())).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE).setFont(vuArialItalic));
 
         table.addCell(new Cell().add(nestedTable).setBorder(Border.NO_BORDER));
-
-        Border gb = new SolidBorder(Color.GRAY, 2f);
-        Table divider = new Table(fullwidth);
-        divider.setBorder(gb);
         document.add(table);
         document.add(onesp);
-        document.add(divider);
-        document.add(onesp);
+
+        Border gb = new SolidBorder(new DeviceRgb(63, 169, 219), 2f);
+        Table divider = new Table(fullwidth);
+        divider.setBorder(gb);
 
         Table twoColTable = new Table(twocolumnWidth);
-        twoColTable.addCell(getBillingAndShippingCell("Billing Information: "));
-        twoColTable.addCell(getBillingAndShippingCell("Shipping Information: "));
+        twoColTable.addCell(getBillingAndShippingCell("Thông tin người bán:").setFont(vuArialBold));
+        twoColTable.addCell(getBillingAndShippingCell("Thông tin người mua:").setFont(vuArialBold));
         document.add(twoColTable.setMarginBottom(12f));
 
         Table twocolTable2 = new Table(twocolumnWidth);
-        twocolTable2.addCell(getCell10Left("Company", true));
-        twocolTable2.addCell(getCell10Left("Name, Phone", true));
-        twocolTable2.addCell(getCell10Left("Công ty Thuốc thú y The Pet", false));
-        twocolTable2.addCell(getCell10Left(address.getFullName() + ", " + address.getPhone(), false));
+        twocolTable2.addCell(getCell10Left("Tên người bán:", vuArialItalic));
+        twocolTable2.addCell(getCell10Left("Tên người mua:", vuArialItalic));
+        twocolTable2.addCell(getCell10Left("Công ty thuốc thú y The Pet", vuArial));
+        twocolTable2.addCell(getCell10Left(address.getFullName(), vuArial));
         document.add(twocolTable2);
 
         Table twocolTable3 = new Table(twocolumnWidth);
-        twocolTable3.addCell(getCell10Left("Hotline", true));
-        twocolTable3.addCell(getCell10Left("Address", true));
-        twocolTable3.addCell(getCell10Left("1900 9054", false));
-        twocolTable3.addCell(getCell10Left(address.getDetailAddress() + ", " + address.getWard() + ", " + address.getDistrict() + ", " + address.getProvince(), false));
+        twocolTable3.addCell(getCell10Left("Số hotline:", vuArialItalic));
+        twocolTable3.addCell(getCell10Left("Số điện thoại:", vuArialItalic));
+        twocolTable3.addCell(getCell10Left("1900 9054", vuArial));
+        twocolTable3.addCell(getCell10Left( address.getPhone(), vuArial));
         document.add(twocolTable3);
 
-        float oneColumnwidth[] = {twocols150};
+        Table twocolTable4 = new Table(twocolumnWidth);
+        twocolTable4.addCell(getCell10Left("Địa chỉ:", vuArialItalic));
+        twocolTable4.addCell(getCell10Left("Địa chỉ:", vuArialItalic));
+        twocolTable4.addCell(getCell10Left("Khu phố 6, Phường Linh Trung, TP. Thủ Đức, TP. Hồ Chí Minh.", vuArial));
+        twocolTable4.addCell(getCell10Left(address.getDetailAddress() + ", " + address.getWard() + ", " + address.getDistrict() + ", " + address.getProvince(), vuArial));
+        document.add(twocolTable4);
+
+        Table twocolTable5 = new Table(twocolumnWidth);
+        twocolTable5.addCell(getCell10Left("Email:", vuArialItalic));
+        twocolTable5.addCell(getCell10Left("Email", vuArialItalic));
+        twocolTable5.addCell(getCell10Left("doanwebnhom30@gmail.com", vuArial));
+//        twocolTable5.addCell(getCell10Left(address., vuArial));
+        document.add(twocolTable5);
+
+        float oneColumnwidth[] = {twocols + 150f};
         Table oneColTable1 = new Table(oneColumnwidth);
-        oneColTable1.addCell(getCell10Left("Address", true));
-        oneColTable1.addCell(getCell10Left("Khu phố 6, Phường Linh Trung,\n TP. Thủ Đức, TP. Hồ Chí Minh.", false));
-        oneColTable1.addCell(getCell10Left("Email", true));
-        oneColTable1.addCell(getCell10Left("doanwebnhom30@gmail.com", false));
+        oneColTable1.addCell(getCell10Left("Email:", vuArialItalic));
+        oneColTable1.addCell(getCell10Left("doanwebnhom30@gmail.com", vuArial));
         document.add(oneColTable1.setMarginBottom(10f));
 
         Table tableDivider2 = new Table(fullwidth);
         Border dgb = new DashedBorder(Color.GRAY, 0.5f);
         document.add(tableDivider2.setBorder(dgb));
         Paragraph productPara = new Paragraph("Products");
-        document.add(productPara.setFont(vuArial1));
+        document.add(productPara.setFont(vuArial));
 
         Table threeColTable1 = new Table(threeColumnWidth);
         threeColTable1.setBackgroundColor(Color.GRAY, 0.7f);
 
-        threeColTable1.addCell(new Cell().add("Description").setFont(vuArial1).setFontColor(Color.WHITE).setBorder(Border.NO_BORDER));
-        threeColTable1.addCell(new Cell().add("Quantity").setFont(vuArial1).setFontColor(Color.WHITE).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
-        threeColTable1.addCell(new Cell().add("Price").setFont(vuArial1).setFontColor(Color.WHITE).setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER).setMarginRight(15f));
+        threeColTable1.addCell(new Cell().add("Description").setFont(vuArial).setFontColor(Color.WHITE).setBorder(Border.NO_BORDER));
+        threeColTable1.addCell(new Cell().add("Quantity").setFont(vuArial).setFontColor(Color.WHITE).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
+        threeColTable1.addCell(new Cell().add("Price").setFont(vuArial).setFontColor(Color.WHITE).setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER).setMarginRight(15f));
         document.add(threeColTable1);
         Table threeColTable2 = new Table(threeColumnWidth);
         float totalSum = 0f;
@@ -168,7 +187,7 @@ public class GeneratePdf {
         document.add(divider.setBorder(new SolidBorder(Color.GRAY, 1)).setMarginBottom(15f));
 
         Table tb = new Table(fullwidth);
-        tb.addCell(new Cell().add("TERMS AND CONDITIONS\n").setFont(vuArial1).setBorder(Border.NO_BORDER));
+        tb.addCell(new Cell().add("TERMS AND CONDITIONS\n").setFont(vuArial).setBorder(Border.NO_BORDER));
         List<String> TncList = new ArrayList<>();
         TncList.add("1. This Agreement shall be governed by and construed in accordance with the laws of the Republic of Vietnam, without regard to its conflict of laws provisions.");
         TncList.add("2. The parties hereto agree that this Agreement shall be binding upon and inure to the benefit of the parties and their respective successors, assigns, and permitted assigns.");
@@ -181,7 +200,7 @@ public class GeneratePdf {
     }
 
     static Cell getHeaderTextCell(String textValue) {
-        return new Cell().add(textValue).setBold().setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.RIGHT);
+        return new Cell().add(textValue).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.RIGHT);
     }
 
     static Cell getHeaderTextCellValue(String textValue) {
@@ -189,17 +208,53 @@ public class GeneratePdf {
     }
 
     static Cell getBillingAndShippingCell(String textValue) {
-        return new Cell().add(textValue).setFontSize(12f).setBold().setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT);
+        return new Cell().add(textValue).setFontSize(12f).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT);
     }
 
-    static  Cell getCell10Left(String textValue, Boolean isBold) {
-        Cell cell = new Cell().add(textValue).setFontSize(10f).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT);
-        return isBold?cell.setBold():cell;
+    static  Cell getCell10Left(String textValue, PdfFont font) {
+        Cell cell = new Cell().add(textValue).setFontSize(10f).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT).setFont(font);
+        return cell;
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String path = "D:\\Font.pdf";
+        PdfWriter writer = new PdfWriter(path);
+        PdfDocument pdfDocument = new PdfDocument(writer);
+        pdfDocument.setDefaultPageSize(PageSize.A4);
+        Document document = new Document(pdfDocument);
 
+        PdfFont vuArial = PdfFontFactory.createFont(fontPath + vuArialFont, PdfEncodings.IDENTITY_H, true);
+        PdfFont vuArialBold = PdfFontFactory.createFont(fontPath + vuArialBoldFont, PdfEncodings.IDENTITY_H, true);
+        PdfFont vuArialBoldItalic = PdfFontFactory.createFont(fontPath + vuArialBoldItalicFont, PdfEncodings.IDENTITY_H, true);
+        PdfFont vuArialItalic = PdfFontFactory.createFont(fontPath + vuArialItalicFont, PdfEncodings.IDENTITY_H, true);
+
+        float threecol = 190f;
+        float twocols = 285f;
+        float twocols80 = twocols + 80f;
+        float[] twocolumnWidth = {twocols80, twocols};
+        float threeColumnWidth[] = {threecol, threecol, threecol};
+        float fullwidth[] = {threecol*3};
+
+        Table table = new Table(twocolumnWidth);
+        table.setBackgroundColor(new DeviceRgb(173, 255, 47)).setFontColor(Color.WHITE);
+        table.addCell(new Cell().add("HOÁ ĐƠN").setFontSize(30f).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setFont(vuArialBold).setTextAlignment(TextAlignment.CENTER).setMarginBottom(30f).setMarginTop(30f));
+
+        Table nestedTable = new Table(new float[]{twocols * 0.4f, twocols * 0.6f});
+        nestedTable.setMarginBottom(30f).setMarginTop(30f).setVerticalAlignment(VerticalAlignment.MIDDLE);
+        nestedTable.addCell(new Cell().add("Số hoá đơn:").setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT)
+                                                            .setVerticalAlignment(VerticalAlignment.MIDDLE).setFont(vuArialBold));
+        nestedTable.addCell(new Cell().add("98").setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT)
+                                                            .setVerticalAlignment(VerticalAlignment.MIDDLE).setFont(vuArialItalic));
+        nestedTable.addCell(new Cell().add("Thời gian tạo:").setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT)
+                                                            .setVerticalAlignment(VerticalAlignment.MIDDLE).setFont(vuArialBold));
+        nestedTable.addCell(new Cell().add("15-12-2024 02:18:39").setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT)
+                                                            .setVerticalAlignment(VerticalAlignment.MIDDLE).setFont(vuArialItalic));
+
+        table.addCell(new Cell().add(nestedTable).setBorder(Border.NO_BORDER));
+        document.add(table);
+        document.close();
+        System.out.println("PDF Created");
     }
 }

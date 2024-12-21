@@ -34,13 +34,8 @@ public class ExportInvoice extends HttpServlet {
             Order order = new Order();
             order.setId(orderId);
             Map<Order, List<OrderItem>> map = OrderService.getInstance().loadOrderProductByOrder(order);
-            ServletContext servletContext = request.getServletContext();
-            String imagePath = servletContext.getRealPath("/assets/user/img/formIcon/icon-logo.png");
-            ImageData data = ImageDataFactory.create(imagePath);
-            Image img = new Image(data);
-            String font = servletContext.getRealPath("/fonts/vuArial.ttf");
             for(Map.Entry<Order, List<OrderItem>> entry : map.entrySet()) {
-                GeneratePdf.generateInvoice(entry.getKey(), entry.getValue(), font, ip, address, response.getOutputStream());
+                GeneratePdf.generateInvoice(entry.getKey(), entry.getValue(), ip, address, response.getOutputStream());
             }
         }
     }

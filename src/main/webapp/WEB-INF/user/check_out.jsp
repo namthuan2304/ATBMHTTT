@@ -62,27 +62,21 @@
         </h6>
       </div>
     </div>
-    <h4>Chi tiết đơn hàng</h4>
+    <h2 class="title">CHI TIẾT ĐƠN HÀNG</h2><br>
     <form>
       <div class="row">
         <div class="col-lg-5 col-md-6">
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="checkout__input">
-                <p>Họ và tên<span>*</span></p>
-                <input class="form-control" type="text" id="full_name" required />
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <div class="checkout__input">
-                <p>Điện thoại<span>*</span></p>
-                <input type="text" id="phone" required />
-              </div>
-            </div>
+          <div class="checkout__input">
+            <p>Họ và tên<span>*</span></p>
+            <input class="form-control" type="text" id="full_name" required />
+          </div>
+          <div class="checkout__input">
+            <p>Điện thoại<span>*</span></p>
+            <input type="text" id="phone" required />
           </div>
           <div class="checkout__input">
             <p>Địa chỉ<span>*</span></p>
-            <input type="text" id="address" placeholder="Số nhà / Đường" class="checkout__input__add" required />
+            <input type="text" id="address" placeholder="Số nhà/ Đường" required />
           </div>
           <div class="checkout__input">
             <p>Tỉnh / Thành phố<span>*</span></p>
@@ -90,36 +84,18 @@
               <option value="0">--Chọn Tỉnh/Thành phố--</option>
             </select>
           </div>
-
           <div class="checkout__input">
             <p>Huyện / Quận<span>*</span></p>
             <select class="form-control" id="quan" name="quan" title="Chọn Quận Huyện" required>
               <option value="0">--Chọn Quận/ Huyện--</option>
             </select>
           </div>
-
           <div class="checkout__input">
             <p>Xã / Phường / Thị trấn<span>*</span></p>
             <select class="form-control" id="phuong" name="phuong" title="Chọn Phường Xã" required>
               <option value="0">--Chọn Phường/ Xã/ Thị trấn--</option>
             </select>
           </div>
-
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="checkout__input">
-                <p>Email<span>*</span></p>
-                <input class="form-control" type="email" id="email" required />
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <div class="checkout__input">
-                <p>At Home?<span></span></p>
-                <input class="form-control" type="checkbox" style="width: 30px;height: 30px" id="at-home" name="at-home">
-              </div>
-            </div>
-          </div>
-
         </div>
         <div class="col-lg-7 col-md-6">
           <div class="checkout__order" style="background-color: #ccc">
@@ -167,13 +143,13 @@
               </table>
 
               <div class="checkout__order__subtotal">
-                Tổng: <br><strong id="result">${requestScope.totalNotVoucher} ${unit}</strong>
+                Tổng: <br><strong id="result">${requestScope.totalNotVoucher} ${unit}</strong><br>
               </div>
-              <div class="checkout__order__subtotal">
-                Giảm: <br><strong id="retain">${sessionScope.retain==null?0.0:sessionScope.retain} ${unit}</strong>
+              <div class="checkout__order__total">
+                Giảm: <br><strong id="retain">${sessionScope.retain==null?0.0:sessionScope.retain} ${unit}</strong><br>
               </div>
-              <div class="checkout__order__subtotal">
-                Phí vận chuyển: <br><strong><%=request.getAttribute("priceShipment")%> ${unit}</strong>
+              <div class="checkout__order__total">
+                Phí vận chuyển: <br><strong><%=request.getAttribute("priceShipment")%> ${unit}</strong><br>
               </div>
               <div class="checkout__order__total">
                 Tổng tiền thanh toán: <br><strong id="all" style="color: red;"><%=request.getAttribute("totalPrice")%> ${unit}</strong>
@@ -183,9 +159,9 @@
             <div>
               <button type="submit" id="btn_submit" class="site-btn">Đặt hàng</button>
             </div>
-            <div>
-              <button type="button" id="btn_vnpay" class="site-btn">Thanh toán ngay</button>
-            </div>
+<%--            <div>--%>
+<%--              <button type="button" id="btn_vnpay" class="site-btn">Thanh toán ngay</button>--%>
+<%--            </div>--%>
           </div>
         </div>
       </div>
@@ -287,7 +263,6 @@
     const phone = document.getElementById("phone").value;
     const address = document.getElementById("address").value;
     const email = document.getElementById("email").value;
-    const atHome = document.getElementById("at-home").value;
     const id = '${param.id}';
     const quantity = '${param.quantity}';
 
@@ -332,7 +307,6 @@
       txt_inv_company: "Sample Company", // oke
       txt_inv_taxcode: "123456789", // oke
       cbo_inv_type: "I", // oke
-      atHome: atHome, // oke
       id: id, // oke
       quantity: quantity // oke
     };
@@ -354,6 +328,8 @@
   }
   document.getElementById("btn_vnpay").addEventListener("click", handleVnpayClick);
 </script>
+
+
 <script>
   $(document).ready(function() {
     $('#btn_submit').click(function (event) {
@@ -364,8 +340,6 @@
       var fullNameTinh = $("#tinh option:selected").data('full-name');
       var fullNameQuan = $("#quan option:selected").data('full-name');
       var fullNamePhuong = $("#phuong option:selected").data('full-name');
-      var email = $('#email').val();
-      var atHome = $('#at-home').is(':checked');
       var id = '${param.id}';
       var quantity = '${param.quantity}';
       $.ajax({
@@ -373,12 +347,10 @@
         data: {
           fullName: fullName,
           phone: phone,
-          email: email,
           tinh: fullNameTinh,
           quan: fullNameQuan,
           phuong: fullNamePhuong,
           address: address,
-          atHome: atHome,
           id: id,
           quantity: quantity
         },

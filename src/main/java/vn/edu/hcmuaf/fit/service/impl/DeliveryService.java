@@ -53,7 +53,7 @@ public class DeliveryService extends LogDAO<DeliveryAddress> implements IDeliver
         DeliveryAddress success = null;
         try {
             Level level;
-            success = DeliveryDAO.getInstance().addDeliveryAddress(delivery.getUser().getId(), delivery.getFullName(), delivery.getPhone(), delivery.getProvince(), delivery.getDistrict(), delivery.getWard(), delivery.getDetailAddress(), delivery.getAtHome(), delivery.getIsPrimary());
+            success = DeliveryDAO.getInstance().addDeliveryAddress(delivery.getUser().getId(), delivery.getFullName(), delivery.getPhone(), delivery.getProvince(), delivery.getDistrict(), delivery.getWard(), delivery.getDetailAddress());
             if(success != null) {
                 delivery.setAfterData("Add delivery success with ID=" + success.getId());
                 level = LevelDAO.getInstance().getLevel(1).get(0);
@@ -68,29 +68,12 @@ public class DeliveryService extends LogDAO<DeliveryAddress> implements IDeliver
         }
     }
 
-    public static void main(String[] args) {
-        DeliveryAddress deliveryAddress = new DeliveryAddress();
-        User user = new User();
-        user.setId(83);
-        deliveryAddress.setUser(user);
-        deliveryAddress.setFullName("John Doe");
-        deliveryAddress.setPhone("0987654321");
-        deliveryAddress.setProvince("Hà Nội");
-        deliveryAddress.setDistrict("Tây Hồ");
-        deliveryAddress.setWard("Đội Cung");
-        deliveryAddress.setDetailAddress("123 Đường Thanh Niên");
-        deliveryAddress.setAtHome(true);
-        deliveryAddress.setIsPrimary(true);
-
-        System.out.println(DeliveryService.getInstance().addDeliveryAddress(deliveryAddress, "124", "jdidsjd"));
-    }
-
     @Override
     public boolean updateDeliveryAddress(DeliveryAddress delivery, String ip, String address) {
         boolean success;
         try {
             Level level;
-            success = DeliveryDAO.getInstance().updateDeliveryAddress(delivery.getUser().getId(), delivery.getId(), delivery.getFullName(), delivery.getPhone(), delivery.getProvince(), delivery.getDistrict(), delivery.getWard(), delivery.getDetailAddress(), delivery.getAtHome(), delivery.getIsPrimary());
+            success = DeliveryDAO.getInstance().updateDeliveryAddress(delivery.getUser().getId(), delivery.getId(), delivery.getFullName(), delivery.getPhone(), delivery.getProvince(), delivery.getDistrict(), delivery.getWard(), delivery.getDetailAddress());
             if(success) {
                 delivery.setAfterData("Update delivery successfully with id: " + delivery.getId());
                 level = LevelDAO.getInstance().getLevel(1).get(0);
