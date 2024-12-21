@@ -167,26 +167,18 @@ public class Checkout extends HttpServlet {
             out.write("{\"result\": \"" + re + "\", \"rect\": \"" + re * discount.getSalePercent() +"\", \"last\": \""+(retain+priceShipment)+"\"}");
         } else {
             User user = (User) session.getAttribute("auth");
-
             String fullName = request.getParameter("fullName");
             String phone = request.getParameter("phone");
-            String email = request.getParameter("email");
-
             String tinh = request.getParameter("tinh");
             String quan = request.getParameter("quan");
             String phuong = request.getParameter("phuong");
-
             String address = request.getParameter("address");
-            boolean atHome = request.getParameter("atHome")==null? false: Boolean.parseBoolean(request.getParameter("atHome"));
 
             boolean ok = true;
             if ((fullName == null) || (fullName.equals(""))) {
                 ok = false;
             }
             if ((phone == null) || (phone.equals(""))) {
-                ok = false;
-            }
-            if ((email == null) || (email.equals(""))) {
                 ok = false;
             }
             if ((tinh == null) || (tinh.equals("")) || (tinh.equals("0"))) {
@@ -201,12 +193,11 @@ public class Checkout extends HttpServlet {
             if ((address == null) || (address.equals(""))) {
                 ok = false;
             }
-
             if (!ok) {
                 out.write("{\"error\":\"Please fill in all information completely\"}");
             } else {
                 if (user != null) {
-                    DeliveryAddress dev = new DeliveryAddress(user, fullName, phone, tinh, quan, phuong, address, atHome, true);
+                    DeliveryAddress dev = new DeliveryAddress(user, fullName, phone, tinh, quan, phuong, address);
                     DeliveryAddress delivery = DeliveryService.getInstance().addDeliveryAddress(dev, ip, "/user/checkout");
 
                     Order order = new Order();

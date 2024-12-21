@@ -11,11 +11,9 @@ public interface IDeliveryDAO extends GenericDAO<DeliveryAddress> {
 
     List<DeliveryAddress> loadAddressById(Integer id);
 
-    DeliveryAddress addDeliveryAddress(Integer userId, String fullName, String phone, String province, String district,
-                                       String ward, String detailAddress, Boolean atHome, Boolean primary);
+    DeliveryAddress addDeliveryAddress(Integer userId, String fullName, String phone, String province, String district, String ward, String detailAddress);
 
-    boolean updateDeliveryAddress(Integer userId, Integer addressId, String fullName, String phone, String province, String district,
-                                       String ward, String detailAddress, Boolean atHome, Boolean primary);
+    boolean updateDeliveryAddress(Integer userId, Integer addressId, String fullName, String phone, String province, String district, String ward, String detailAddress);
 
     boolean deleteDeliveryAddress(Integer userId, Integer addressId);
 

@@ -154,7 +154,7 @@ public class VNPayServlet extends HttpServlet {
             List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
             User user = (User) session.getAttribute("auth");
 
-            DeliveryAddress dev = new DeliveryAddress(user, fullName, phone, tinhText, quanText, phuongText, homeNumber, atHome.equals("on"), true);
+            DeliveryAddress dev = new DeliveryAddress(user, fullName, phone, tinhText, quanText, phuongText, homeNumber);
             DeliveryAddress delivery = DeliveryService.getInstance().addDeliveryAddress(dev, ip, "/user/checkout");
             Order order = new Order();
             order.setUser(user);

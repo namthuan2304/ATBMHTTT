@@ -39,6 +39,24 @@
     table th {
       background-color: #f2f2f2;
     }
+    .total-container {
+      display: flex;
+      justify-content: space-between; /* Căn dòng hai bên */
+      align-items: center; /* Căn chỉnh dọc giữa */
+      font-size: 16px; /* Cỡ chữ tùy chỉnh */
+      margin-top: 10px; /* Khoảng cách trên nếu cần */
+    }
+
+    .total-label {
+      font-weight: normal;
+      color: #333; /* Màu chữ cho nhãn */
+      font-size: 18px;
+    }
+
+    .total-value {
+      font-weight: bold; /* Giá trị đậm */
+      font-size: 20px;
+    }
   </style>
 </head>
 <body>
@@ -52,7 +70,7 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-12">
-        <h6>
+        <h6 style="margin-bottom: 50px;">
           <span class="icon_tag_alt"></span>
           <form class="d-flex align-items-center w-50 mx-auto mt-2">
             <input type="text" id="discount" class="form-control" placeholder="Nhập mã giảm giá" value="${sessionScope.discount.code}">
@@ -62,64 +80,43 @@
         </h6>
       </div>
     </div>
-    <h4>Chi tiết đơn hàng</h4>
+    <h2 class="title">CHI TIẾT ĐƠN HÀNG</h2><br>
     <form>
       <div class="row">
         <div class="col-lg-5 col-md-6">
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="checkout__input">
-                <p>Họ và tên<span>*</span></p>
-                <input class="form-control" type="text" id="full_name" required />
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <div class="checkout__input">
-                <p>Điện thoại<span>*</span></p>
-                <input type="text" id="phone" required />
-              </div>
-            </div>
+          <div class="checkout__input">
+            <p>Họ và tên<span>*</span></p>
+            <input class="form-control" type="text" id="full_name" required />
+          </div>
+          <div class="checkout__input">
+            <p>Điện thoại<span>*</span></p>
+            <input type="text" id="phone" required />
           </div>
           <div class="checkout__input">
             <p>Địa chỉ<span>*</span></p>
-            <input type="text" id="address" placeholder="Số nhà / Đường" class="checkout__input__add" required />
+            <input type="text" id="address" placeholder="Số nhà/ Đường" required />
           </div>
           <div class="checkout__input">
             <p>Tỉnh / Thành phố<span>*</span></p>
-            <select class="form-control" id="tinh" name="tinh" title="Chọn Tỉnh Thành" required>
-              <option value="0">--Chọn Tỉnh/Thành phố--</option>
+            <select class="form-control" style="width: 100%;height: 46px;border: 1px solid #ebebeb;padding-left: 20px;font-size: 16px;color: #b2b2b2;
+                  border-radius: 4px;" id="tinh" name="tinh" title="Chọn Tỉnh Thành" required>
+              <option value="0">Chọn Tỉnh/Thành phố</option>
             </select>
           </div>
-
           <div class="checkout__input">
             <p>Huyện / Quận<span>*</span></p>
-            <select class="form-control" id="quan" name="quan" title="Chọn Quận Huyện" required>
-              <option value="0">--Chọn Quận/ Huyện--</option>
+            <select class="form-control" style="width: 100%;height: 46px;border: 1px solid #ebebeb;padding-left: 20px;font-size: 16px;color: #b2b2b2;
+                  border-radius: 4px;" id="quan" name="quan" title="Chọn Quận Huyện" required>
+              <option value="0">Chọn Quận/Huyện</option>
             </select>
           </div>
-
           <div class="checkout__input">
             <p>Xã / Phường / Thị trấn<span>*</span></p>
-            <select class="form-control" id="phuong" name="phuong" title="Chọn Phường Xã" required>
-              <option value="0">--Chọn Phường/ Xã/ Thị trấn--</option>
+            <select class="form-control" style="width: 100%;height: 46px;border: 1px solid #ebebeb;padding-left: 20px;font-size: 16px;color: #b2b2b2;
+                  border-radius: 4px;" id="phuong" name="phuong" title="Chọn Phường Xã" required>
+              <option value="0">Chọn Phường/Xã/Thị trấn</option>
             </select>
           </div>
-
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="checkout__input">
-                <p>Email<span>*</span></p>
-                <input class="form-control" type="email" id="email" required />
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <div class="checkout__input">
-                <p>At Home?<span></span></p>
-                <input class="form-control" type="checkbox" style="width: 30px;height: 30px" id="at-home" name="at-home">
-              </div>
-            </div>
-          </div>
-
         </div>
         <div class="col-lg-7 col-md-6">
           <div class="checkout__order" style="background-color: #ccc">
@@ -167,25 +164,42 @@
               </table>
 
               <div class="checkout__order__subtotal">
-                Tổng: <br><strong id="result">${requestScope.totalNotVoucher} ${unit}</strong>
-              </div>
-              <div class="checkout__order__subtotal">
-                Giảm: <br><strong id="retain">${sessionScope.retain==null?0.0:sessionScope.retain} ${unit}</strong>
-              </div>
-              <div class="checkout__order__subtotal">
-                Phí vận chuyển: <br><strong><%=request.getAttribute("priceShipment")%> ${unit}</strong>
+<%--                Tổng: <br><strong id="result">${requestScope.totalNotVoucher} ${unit}</strong><br>--%>
+                <div class="total-container">
+                  <span class="total-label">Tổng giá:</span>
+                  <strong class="total-value" id="result">${requestScope.totalNotVoucher} ${unit}</strong>
+                </div>
+
               </div>
               <div class="checkout__order__total">
-                Tổng tiền thanh toán: <br><strong id="all" style="color: red;"><%=request.getAttribute("totalPrice")%> ${unit}</strong>
+                <div class="total-container">
+                  <span class="total-label" style="color: black">Giá giảm:</span>
+                  <strong class="total-value" id="retain">${sessionScope.retain==null?0.0:sessionScope.retain} ${unit}</strong>
+                </div>
+<%--                Giảm: <br><strong id="retain">${sessionScope.retain==null?0.0:sessionScope.retain} ${unit}</strong><br>--%>
+              </div>
+              <div class="checkout__order__total">
+                <div class="total-container">
+                  <span class="total-label" style="color: black">Phí vận chuyển:</span>
+                  <strong class="total-value"><%=request.getAttribute("priceShipment")%> ${unit}</strong>
+                </div>
+<%--                Phí vận chuyển: <br><strong><%=request.getAttribute("priceShipment")%> ${unit}</strong><br>--%>
+              </div>
+              <div class="checkout__order__total">
+                <div class="total-container">
+                  <span class="total-label" style="color: black">Tổng tiền thanh toán:</span>
+                  <strong class="total-value" id="all" style="color: #b22222"><%=request.getAttribute("totalPrice")%> ${unit}</strong>
+                </div>
+<%--                Tổng tiền thanh toán: <br><strong id="all" style="color: red;"><%=request.getAttribute("totalPrice")%> ${unit}</strong>--%>
               </div>
             </div>
             <span style="color:red; margin-top: 10px;" id="error"></span>
             <div>
               <button type="submit" id="btn_submit" class="site-btn">Đặt hàng</button>
             </div>
-            <div>
-              <button type="button" id="btn_vnpay" class="site-btn">Thanh toán ngay</button>
-            </div>
+<%--            <div>--%>
+<%--              <button type="button" id="btn_vnpay" class="site-btn">Thanh toán ngay</button>--%>
+<%--            </div>--%>
           </div>
         </div>
       </div>
@@ -259,8 +273,8 @@
       var idtinh = $(this).val();
       $.getJSON('https://esgoo.net/api-tinhthanh/2/' + idtinh + '.htm', function (data_quan) {
         if (data_quan.error == 0) {
-          $("#quan").empty().append('<option value="0">--Chọn Quận Huyện--</option>');
-          $("#phuong").empty().append('<option value="0">--Chọn Phường/ Xã/ Thị trấn--</option>');
+          $("#quan").empty().append('<option value="0">Chọn Quận/Huyện</option>');
+          $("#phuong").empty().append('<option value="0">Chọn Phường/Xã/Thị trấn</option>');
           $.each(data_quan.data, function (key_quan, val_quan) {
             $("#quan").append('<option value="' + val_quan.id + '" data-full-name="' + val_quan.full_name + '">' + val_quan.full_name + '</option>');
           });
@@ -271,7 +285,7 @@
       var idquan = $(this).val();
       $.getJSON('https://esgoo.net/api-tinhthanh/3/' + idquan + '.htm', function (data_phuong) {
         if (data_phuong.error == 0) {
-          $("#phuong").empty().append('<option value="0">--Chọn Phường/ Xã/ Thị trấn--</option>');
+          $("#phuong").empty().append('<option value="0">Chọn Phường/Xã/Thị trấn</option>');
           $.each(data_phuong.data, function (key_phuong, val_phuong) {
             $("#phuong").append('<option value="' + val_phuong.id + '" data-full-name="' + val_phuong.full_name + '">' + val_phuong.full_name + '</option>');
           });
@@ -287,7 +301,6 @@
     const phone = document.getElementById("phone").value;
     const address = document.getElementById("address").value;
     const email = document.getElementById("email").value;
-    const atHome = document.getElementById("at-home").value;
     const id = '${param.id}';
     const quantity = '${param.quantity}';
 
@@ -332,7 +345,6 @@
       txt_inv_company: "Sample Company", // oke
       txt_inv_taxcode: "123456789", // oke
       cbo_inv_type: "I", // oke
-      atHome: atHome, // oke
       id: id, // oke
       quantity: quantity // oke
     };
@@ -354,6 +366,8 @@
   }
   document.getElementById("btn_vnpay").addEventListener("click", handleVnpayClick);
 </script>
+
+
 <script>
   $(document).ready(function() {
     $('#btn_submit').click(function (event) {
@@ -364,8 +378,6 @@
       var fullNameTinh = $("#tinh option:selected").data('full-name');
       var fullNameQuan = $("#quan option:selected").data('full-name');
       var fullNamePhuong = $("#phuong option:selected").data('full-name');
-      var email = $('#email').val();
-      var atHome = $('#at-home').is(':checked');
       var id = '${param.id}';
       var quantity = '${param.quantity}';
       $.ajax({
@@ -373,12 +385,10 @@
         data: {
           fullName: fullName,
           phone: phone,
-          email: email,
           tinh: fullNameTinh,
           quan: fullNameQuan,
           phuong: fullNamePhuong,
           address: address,
-          atHome: atHome,
           id: id,
           quantity: quantity
         },

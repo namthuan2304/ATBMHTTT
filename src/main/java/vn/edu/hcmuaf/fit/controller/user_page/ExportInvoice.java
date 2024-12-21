@@ -26,6 +26,7 @@ public class ExportInvoice extends HttpServlet {
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=invoice.pdf");
         String id = request.getParameter("id");
+        String basePath = getServletContext().getRealPath("assets\\fonts\\");
         String address = "/user/download";
         String ip = request.getHeader("X-FORWARDED-FOR");
         if (ip == null) ip = request.getRemoteAddr();
@@ -34,13 +35,8 @@ public class ExportInvoice extends HttpServlet {
             Order order = new Order();
             order.setId(orderId);
             Map<Order, List<OrderItem>> map = OrderService.getInstance().loadOrderProductByOrder(order);
-            ServletContext servletContext = request.getServletContext();
-            String imagePath = servletContext.getRealPath("/assets/user/img/formIcon/icon-logo.png");
-            ImageData data = ImageDataFactory.create(imagePath);
-            Image img = new Image(data);
-            String font = servletContext.getRealPath("/fonts/vuArial.ttf");
             for(Map.Entry<Order, List<OrderItem>> entry : map.entrySet()) {
-                GeneratePdf.generateInvoice(entry.getKey(), entry.getValue(), font, ip, address, response.getOutputStream());
+                GeneratePdf.generateInvoice(entry.getKey(), entry.getValue(), basePath, ip, address, response.getOutputStream());
             }
         }
     }

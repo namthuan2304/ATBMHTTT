@@ -22,11 +22,8 @@ public class DeliveryAddress extends AbsModel implements Serializable {
      String district;
      String ward;
      String detailAddress;
-     Boolean atHome;
-     Boolean isPrimary;
 
-     public DeliveryAddress(User user, String fullName, String phone, String province, String district,
-                            String ward, String detailAddress, Boolean atHome, Boolean primary) {
+     public DeliveryAddress(User user, String fullName, String phone, String province, String district, String ward, String detailAddress) {
          this.user = user;
          this.fullName = fullName;
          this.phone = phone;
@@ -34,11 +31,7 @@ public class DeliveryAddress extends AbsModel implements Serializable {
          this.district = district;
          this.ward = ward;
          this.detailAddress = detailAddress;
-         this.atHome = atHome;
-         this.isPrimary = primary;
      }
-
-
 
     @Nested("user")
     public User getUser() {

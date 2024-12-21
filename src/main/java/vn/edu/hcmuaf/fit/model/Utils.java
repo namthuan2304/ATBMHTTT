@@ -24,7 +24,7 @@ public class Utils {
         }
 
         // Tạo đối tượng SimpleDateFormat để định dạng ngày tháng
-        SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        SimpleDateFormat outputFormat = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy");
 
         // Sử dụng Timestamp để lấy Date
         Date date = new Date(inputDate.getTime());
