@@ -36,17 +36,16 @@ public class GeneratePdf {
     public static final String vuArialBoldItalicFont = "vuArialBoldItalic.ttf";
     public static final String vuArialItalicFont = "vuArialItalic.ttf";
 
-    public static void generateInvoice(Order order, List<OrderItem> item, String ip, String addressLink, OutputStream outputStream) throws IOException {
-
+    public static void generateInvoice(Order order, List<OrderItem> item, String path, String ip, String addressLink, OutputStream outputStream) throws IOException {
         PdfWriter writer = new PdfWriter(outputStream);
         PdfDocument pdfDocument = new PdfDocument(writer);
         pdfDocument.setDefaultPageSize(PageSize.A4);
         Document document = new Document(pdfDocument);
 
-        PdfFont vuArial = PdfFontFactory.createFont(fontPath + vuArialFont, PdfEncodings.IDENTITY_H, true);
-        PdfFont vuArialBold = PdfFontFactory.createFont(fontPath + vuArialBoldFont, PdfEncodings.IDENTITY_H, true);
-        PdfFont vuArialBoldItalic = PdfFontFactory.createFont(fontPath + vuArialBoldItalicFont, PdfEncodings.IDENTITY_H, true);
-        PdfFont vuArialItalic = PdfFontFactory.createFont(fontPath + vuArialItalicFont, PdfEncodings.IDENTITY_H, true);
+        PdfFont vuArial = PdfFontFactory.createFont(path + "\\"+ vuArialFont, PdfEncodings.IDENTITY_H, true);
+        PdfFont vuArialBold = PdfFontFactory.createFont(path + "\\"+ vuArialBoldFont, PdfEncodings.IDENTITY_H, true);
+        PdfFont vuArialBoldItalic = PdfFontFactory.createFont(path + "\\"+ vuArialBoldItalicFont, PdfEncodings.IDENTITY_H, true);
+        PdfFont vuArialItalic = PdfFontFactory.createFont(path + "\\"+ vuArialItalicFont, PdfEncodings.IDENTITY_H, true);
 
         DeliveryAddress address = DeliveryService.getInstance().loadAddressByOrder(order);
         OrderStatus status = OrderStatusService.getInstance().getStatusById(order.getStatus());
@@ -110,12 +109,12 @@ public class GeneratePdf {
         twocolTable4.addCell(getCell10Left(address.getDetailAddress() + ", " + address.getWard() + ", " + address.getDistrict() + ", " + address.getProvince(), vuArial));
         document.add(twocolTable4);
 
-        Table twocolTable5 = new Table(twocolumnWidth);
-        twocolTable5.addCell(getCell10Left("Email:", vuArialItalic));
-        twocolTable5.addCell(getCell10Left("Email", vuArialItalic));
-        twocolTable5.addCell(getCell10Left("doanwebnhom30@gmail.com", vuArial));
+//        Table twocolTable5 = new Table(twocolumnWidth);
+//        twocolTable5.addCell(getCell10Left("Email:", vuArialItalic));
+//        twocolTable5.addCell(getCell10Left("Email", vuArialItalic));
+//        twocolTable5.addCell(getCell10Left("doanwebnhom30@gmail.com", vuArial));
 //        twocolTable5.addCell(getCell10Left(address., vuArial));
-        document.add(twocolTable5);
+//        document.add(twocolTable5);
 
         float oneColumnwidth[] = {twocols + 150f};
         Table oneColTable1 = new Table(oneColumnwidth);
