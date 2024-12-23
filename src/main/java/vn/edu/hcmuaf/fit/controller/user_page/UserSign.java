@@ -145,7 +145,7 @@ public class UserSign extends HttpServlet {
             for (Map.Entry<Order, List<OrderItem>> entry : map.entrySet()) {
                 List<OrderItem> items = entry.getValue();
                 Order order = entry.getKey();
-
+                System.out.println(order.getId());
                 // get user info
                 Class<?> userClass = user.getClass();
                 Field[] userFields = userClass.getDeclaredFields();
@@ -207,8 +207,10 @@ public class UserSign extends HttpServlet {
                         Hash hash = new Hash();
                         String hashOrder = null;
                         hashOrder = hash.hash(root.toString());
-                        request.setAttribute("hash", hashOrder);
+//                        request.setAttribute("hash", hashOrder);
                         System.out.println(root.toString());
+                        System.out.println(hashOrder);
+                        System.out.println(verifySign.verify(sign, publicKey, hashOrder));
                         if (verifySign.verify(sign, publicKey, hashOrder)) {
                             boolean rs = OrderService.getInstance().saveSignature(order, sign, ip, "user/sign");
                             if (rs) {

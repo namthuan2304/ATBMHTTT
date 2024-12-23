@@ -65,10 +65,11 @@ public class VerifySign {
     }
 
     public static void main(String[] args) throws Exception {
-        String sign = "H7/vcxrTCQhXvT6H3k2ofAn3komIOHEPOJ6qt38i+CYesTtL3nZmzNwbiEZ8jYM5U3q+t8u9q8gKJ9rcrEIqNsUIC7RpoTO+e7OCbG41KjWbXSKtHK8ShiZ9yKyJfS1y07SzZfKvnsIwgzgL5+CdL7M/lJEj2OOstp+lVuBXdPBV9vfFaDTDssI+ZgR9ZVudSTbjd+QSrR0sjGodSVx6NoW3s93yNXa56297jLDAxv/NhgUAU6Dd2/SXEA8JhauglxKL4/xBASP7zTfewBDG1KBmhBi0SkehAlSoJoM59SetTdewbtItD8xL9GvpZ9Vgax5QqtYfdfyl6CpNffk0RQ==";
+        String sign = "sjAkLKpD5/vR62Axui11m4iykpl1t/dWymQyuj8Xi+faF7kMNgeRncHVIskhXjFuYigr7I0GgujiTmKAbDuPTaMD7wbcSa6zAtU1b6MMgL9PpaxmOOZzie/hk465o79vusF16nPrZI1OEupYKrO2ZOdT0wyU4hpIhsp1iYONZZiCRcSJrmCYvbAyOYGrmwYpq7h0IXQfAW341V1q2eBMVhBY67C8jDj9q2z2XWXpg1afy2XleOT2+5nOUEDXxiIm5kVAEYd31aONjukciyWLR6J4Yww1QrsCvLAFKyOvwZZ6aEPCegLpj/Sp9SHhXYnR5W096Oqv8XOfv5HlB08upWbET0LPBKyDLHQlXGY8Vb3rop5xanF4LvfOuZ3YTgha5par+g88jlxqu8QLbva2KP6e/yaRPyW9IPWRqzPymngBDqb11masORpAkEAmlNTo890MsUuQsAG4l3RBo5h6Ol3giGruMmtwnPHy7aJm5DeueeAy1o/2CkSik3fg+0ZbBPAx8yiAEB3tRFH7xFFCEo2ytOyJv0nwCt1Fj4jlpKrR5QNQKjxwYYRFAYm8rQEI0fLMIJI8S/ysACoZs6zAKODQMqow1Um0eTygy/ohRqqe31fjZNikWyZ9VC+oeXCm0opa1n6N06NZA6OuN2WX9oebx3aVxDabtztltgVxvp4=";
         VerifySign verifySign = new VerifySign();
-        PublicKey publicKey = verifySign.convertBase64ToPublicKey("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqglG0attVDWgftuJmKMcPh7uqf+JAlgAANUBJtHVCltj80JeXk3UwREo+bUUZ5vdX3zPyGb6Lv1qidSwvvcdsp+wZHTYXsk6B3c2nI7XVAJoJrlkxoHsWZDrIaRfiaEA9PPndUrulybFWwBHt7L46Aspq6VUV3aE3iOxiKoWhFLxYjyipuHf0dhG0g4N0bMRsy5VXkaCOPtInhgimYrpZJ8Jm+IeeEWmsv4dHFwNwIdnSQYMKhKzXKgUfI3JyE1ah+W5j2d4TT5TTWOkVZI4v0WpYyh9XPHZS+oXR6R7j/yJtH90E963YNkSJK+hrleAAK+OYLPiwrIYme37uofHIwIDAQAB");
-        String hash="901304f3b806cd342252c0a5c14f2fc";
+        PublicKey publicKey = verifySign.convertBase64ToPublicKey("MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA2+xDVKdU1RVt8DI2lmSbeRvqM62xB2i9yjq/7fkr8ORJ1nNjF7OWIyqFK9s6raM942wQnms5VKfjHiztr1uGZqAvxzm1PU4wAmf/zVEbn4ZGzwg41aV/98iWwlZ2vlTJ3M32o49zlXmxVnsWXZ7H1MYHdzDusjSFsvFfLs7xCQbmsm2Ylmit5i8FuGEwkB9sZ3C+zRyUtgk/l8BgUjcTohQsEzZe3X5jmRXMZrWJDOOFMAdqYWa/XdX2Imo7M3JsMY+T/kQr/1vDw95E/ZuOztCPZVUYfu01vKH0HkKw+w1+wOBsRoEY/ZKqb/PCHwKAtHJIXjiaa+ohbfJJK4zCEGWRAFng68Ftqx0mCTpPnw1DHqFFiPs1BPKNNB40BKElPvYND0vgsJNuxBz+yEToDLby8vuUdj2uRxQVa5E/sLMe6Ac5wW7MjUJwSpwJpa9GlVUo2gT+3xY0R89VL52cSd7YUMmYHGhD9Fm4Q+a4oIgrFxcv5ZwHFqvJY14UtPvpNaiLvsWBxxMCiQCREQa7QYfhqXc4dLtAgajjyX5k0o8mFIWUBW5w5Pe9SZrzG+l3cgF3V5RBi+AgYCHtsk6UaoTQq/VXNSVEmz1HFRfMiZo4HMyS29e493pIygQW+xwr5AFXFpILHHd/ZuhJr1TtBQmqBPtb9tYTAIrDmCZ8/QUCAwEAAQ==");
+        String hash="d13bfe7c87915851c0a998415fd77ba7";
         System.out.println(verifySign.verify(sign,publicKey,hash));
+//        System.out.println("Key length: " + publicKey);
     }
 }
