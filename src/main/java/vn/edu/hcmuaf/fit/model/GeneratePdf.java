@@ -18,6 +18,7 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
+import com.itextpdf.signatures.IExternalSignature;
 import vn.edu.hcmuaf.fit.service.impl.DeliveryService;
 import vn.edu.hcmuaf.fit.service.impl.OrderService;
 import vn.edu.hcmuaf.fit.service.impl.OrderStatusService;

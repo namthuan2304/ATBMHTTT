@@ -30,7 +30,9 @@ public class GenerateKeyLost extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=UTF-8");
+//        HttpSession session = request.getSession(true);
 
+        // test xem neu gửi ve mail khác localhost thi co bị expired khong?
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("auth") == null) {
             response.getWriter().write("{\"status\":\"error\", \"message\":\"Session expired. Please log in again.\"}");
