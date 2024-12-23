@@ -176,9 +176,7 @@ public class UpdateInfoUser extends HttpServlet {
             if (sendEmail.sendLinkKey(user.getEmail(), link)) {
                 session.setAttribute("linkKey", link);
                 session.setAttribute("linkKeyExpiry", System.currentTimeMillis() + 30000);
-                System.out.println("odforfkf");
             }
-            System.out.println("ds;kfdopkfdkfdpk");
             out.write("{ \"status\": \"success\"}");
         }
         out.flush();
