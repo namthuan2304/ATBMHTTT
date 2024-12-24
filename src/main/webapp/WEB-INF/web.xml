@@ -18,4 +18,7 @@
         <param-name>password</param-name>
         <param-value></param-value>
     </context-param>
+    <listener>
+        <listener-class>vn.edu.hcmuaf.fit.controller.user_page.OrderApprovalScheduler</listener-class>
+    </listener>
 </web-app>

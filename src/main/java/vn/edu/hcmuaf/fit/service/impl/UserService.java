@@ -322,6 +322,15 @@ public class UserService extends LogDAO<User> implements IUserService {
         }
     }
 
+    @Override
+    public User getUserById(User user) {
+        try {
+            return UserDAO.getInstance().loadUsersWithId(user.getId()).get(0);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     /**
      * TESTED
      * Returns the total number of users in the system.

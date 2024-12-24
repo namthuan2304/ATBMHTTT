@@ -26,6 +26,8 @@ public interface IUserService {
 
     User loadUsersWithId(User user, String ip, String address);
 
+    User getUserById(User user);
+
     Integer sumOfUsers();
 
     boolean updateUserInAdmin(User user, String ip, String address);

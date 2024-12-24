@@ -43,6 +43,7 @@ public class UserSign extends HttpServlet {
         else {
             Map<Order, List<OrderItem>> map = OrderService.getInstance().loadLatestOrderByUser(user);
             for (Map.Entry<Order, List<OrderItem>> entry : map.entrySet()) {
+
                 List<OrderItem> items = entry.getValue();
                 Order order = entry.getKey();
 
