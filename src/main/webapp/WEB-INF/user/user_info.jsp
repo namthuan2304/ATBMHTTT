@@ -561,7 +561,7 @@
                                     <c:if test="${empty sessionScope.send}">
                                         <input id="verifyCode" type="text" name="verifyCode" placeholder="Vui lòng nhập code" required>
                                     </c:if>
-                                        <input type="text" id="publicKeyFile" name="publicKeyFile" accept=".pem" style="display: none; margin-bottom: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; max-width: 400px;">
+                                        <div style="margin-bottom: 5px; display: flex; justify-content: center"><input type="text" id="publicKeyFile" name="publicKeyFile" accept=".pem" style="display: none; margin-bottom: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; max-width: 400px;"></div>
                                 <button id="uploadButton1" type="submit" style="display: none; background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Upload</button>
                                 <button id="uploadButton" type="submit" style="display: inline-block; background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Send</button>
                                 <svg width="10px" height="10px">
