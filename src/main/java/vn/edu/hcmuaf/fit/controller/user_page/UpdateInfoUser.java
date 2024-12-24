@@ -24,9 +24,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @WebServlet("/user/updateinfouser")
 @MultipartConfig
@@ -178,6 +175,13 @@ public class UpdateInfoUser extends HttpServlet {
                 session.setAttribute("linkKeyExpiry", System.currentTimeMillis() + 30000);
             }
             out.write("{ \"status\": \"success\"}");
+        } else if (action.equals("sendEmail1")) {
+            SendEmail sendEmail1 = new SendEmail();
+            String code = sendEmail1.getRandomVerifyCode();
+            if (sendEmail1.sendVerifyCode(user.getEmail(), code)) {
+                session.setAttribute("send", code);
+                out.write("{ \"status\": \"success\", \"code\": \""+code+"\"}");
+            }
         }
         out.flush();
         out.close();

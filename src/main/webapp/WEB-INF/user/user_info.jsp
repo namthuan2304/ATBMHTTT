@@ -551,22 +551,19 @@
                         <div id="uploadPublicKeyButton" class="voltage-button">
                             <form id="uploadKeyForm" enctype="multipart/form-data" method="POST" action="/user/uploadPublicKey">
                                 <label for="publicKeyFile" style="display: block; margin-bottom: 10px; font-weight: bold;">
-                                    Tải Lên Public Key
+                                        <c:if test="${empty sessionScope.send}">
+                                            <h2 id="labelmail">Nhập code gửi về mail</h2>
+                                            <input type="hidden" value="sendEmail1" id="emailAction">
+                                            <button type="button" id="sendEmail">Nhấn đây</button>
+                                        </c:if>
+                                        <h2 id="labeloke" style="display: none">Tải Lên Public Key</h2>
                                 </label>
-                                <input
-                                        type="file"
-                                        id="publicKeyFile"
-                                        name="publicKeyFile"
-                                        accept=".pem"
-                                        style="display: block; margin-bottom: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; max-width: 400px;"
-                                >
-                                <button
-                                        id="uploadButton"
-                                        type="submit"
-                                        style="display: inline-block; background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;"
-                                >
-                                    Upload
-                                </button>
+                                    <c:if test="${empty sessionScope.send}">
+                                        <input id="verifyCode" type="text" name="verifyCode" placeholder="Vui lòng nhập code" required>
+                                    </c:if>
+                                        <input type="text" id="publicKeyFile" name="publicKeyFile" accept=".pem" style="display: none; margin-bottom: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; max-width: 400px;">
+                                <button id="uploadButton1" type="submit" style="display: none; background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Upload</button>
+                                <button id="uploadButton" type="submit" style="display: inline-block; background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Send</button>
                                 <svg width="10px" height="10px">
                                     <path d="M1,5 L5,9 L9,5"></path>
                                 </svg>
@@ -901,86 +898,113 @@
     }
 </script>
 <script>
-    // Lắng nghe sự kiện submit trên form tải lên Public Key
-    document.getElementById('uploadKeyForm').addEventListener('submit', function(event) {
-        event.preventDefault();  // Ngăn form submit mặc định
-
-        // Lấy file từ input
-        const fileInput = document.getElementById('publicKeyFile');
-        const file = fileInput.files[0];
-
-        // Kiểm tra nếu có file được chọn
-        if (!file) {
-            alert('Vui lòng chọn một file để tải lên.');
-            return;
-        }
-
-        // Đọc nội dung của file (public key)
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            // Lấy nội dung của tệp là một chuỗi
-            const publicKeyContent = event.target.result.trim();  // Đảm bảo rằng không có ký tự dư thừa
-
-            // Kiểm tra xem nội dung có phải là một public key dạng PEM không
-            if (isPemFormat(publicKeyContent)) {
-                // Tách public key (loại bỏ phần header và footer PEM)
-                const publicKey = extractPublicKey(publicKeyContent);
-
-                // Gửi yêu cầu AJAX với public key qua POST
-                sendPublicKeyToServer(publicKey);
-            } else {
-                // Nếu không phải PEM, lấy dòng đầu tiên làm public key
-                const firstLine = publicKeyContent.split('\n')[0].trim();
-
-                // Gửi yêu cầu AJAX với public key qua POST
-                sendPublicKeyToServer(firstLine);
+    $(document).ready(function () {
+        $('#uploadButton1').click(function (event) {
+            event.preventDefault();
+            var fileInput = document.getElementById('publicKeyFile').value; // Sửa lỗi thiếu .value
+            if (!fileInput.trim()) {
+                alert('Vui lòng nhập public key.');
+                return;
             }
-        };
-
-        // Đọc nội dung của file dưới dạng văn bản (text)
-        reader.readAsText(file);
-    });
-
-    // Kiểm tra xem nội dung có phải là định dạng PEM không
-    function isPemFormat(content) {
-        const pemHeader = "-----BEGIN PUBLIC KEY-----";
-        const pemFooter = "-----END PUBLIC KEY-----";
-        return content.startsWith(pemHeader) && content.endsWith(pemFooter);
-    }
-
-    // Tách public key ra khỏi phần header và footer của PEM
-    function extractPublicKey(content) {
-        const pemHeader = "-----BEGIN PUBLIC KEY-----";
-        const pemFooter = "-----END PUBLIC KEY-----";
-        // Loại bỏ phần header và footer PEM
-        let publicKey = content.replace(pemHeader, '').replace(pemFooter, '').trim();
-        return publicKey;
-    }
-
-    // Gửi public key lên server
-    function sendPublicKeyToServer(publicKey) {
-        fetch('/user/uploadPublicKey', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',  // Chỉ định kiểu dữ liệu JSON
-            },
-            body: JSON.stringify({ publicKey: publicKey })  // Gửi public key dưới dạng JSON
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    alert('Tải lên thành công!');
-                } else {
-                    alert('Lỗi khi tải lên: ' + data.message);
+            $.ajax({
+                type: 'POST',
+                data: {
+                    fileInput: fileInput
+                },
+                url: 'uploadPublicKey',
+                dataType: 'json',
+                success: function (result) {
+                    try {
+                        if (result.status === "success") {
+                            alert(result.message);
+                        } else {
+                            alert(result.message);
+                        }
+                    } catch (e) {
+                        alert(e);
+                    }
+                },
+                error: function () {
+                    alert("Connection failed");
                 }
-            })
-            .catch(error => {
-                console.error('Có lỗi xảy ra:', error);
-                alert('Có lỗi xảy ra. Vui lòng thử lại.');
             });
-    }
+        });
+    });
 </script>
+<script>
+    var context = "${pageContext.request.contextPath}";
 
+    $(document).ready(function () {
+        // Sự kiện cho nút sendEmail
+        $('#sendEmail').click(function (event) {
+            event.preventDefault();
+            var action = $('#emailAction').val();
+            console.log("Action:", action);
 
+            $.ajax({
+                type: 'POST',
+                data: { action: action },
+                url: 'updateinfouser',
+                dataType: 'json',
+                success: function (result) {
+                    console.log(result);
+                    try {
+                        if (result.status === "success") {
+                            alert("Link gửi khoá tự thêm đã gửi về mail của bạn!");
+
+                            // Gắn sự kiện cho nút uploadButton một lần
+                            $('#uploadButton').off('click').on('click', function (event) {
+                                event.preventDefault();
+                                var code1 = $('#verifyCode').val(); // Lấy giá trị verifyCode
+                                var code2 = result.code; // Lấy giá trị code từ kết quả AJAX
+                                if (!code1 || code1.trim() === "") {
+                                    alert("Vui lòng nhập mã xác minh!");
+                                    return; // Dừng thực thi nếu rỗng
+                                }
+
+                                // AJAX gửi mã verifyCode và code
+                                $.ajax({
+                                    type: 'POST',
+                                    data: { verifyCode: code1, code: code2 },
+                                    url: 'uploadPublicKey',
+                                    dataType: 'json',
+                                    success: function (result) {
+                                        console.log(result);
+                                        try {
+                                            if (result.status === "success") {
+                                                alert("Mã xác nhận chính xác!");
+                                                $('#verifyCode').hide();
+                                                $('#sendEmail').hide();
+                                                $('#labelmail').hide();
+                                                $('#labeloke').css('display', 'block');
+                                                $('#publicKeyFile').css('display', 'block');
+                                                $('#uploadButton').hide();
+                                                $('#uploadButton1').show();
+                                            } else {
+                                                alert("Mã xác nhận không chính xác!");
+                                            }
+                                        } catch (e) {
+                                            alert("Error 2!");
+                                        }
+                                    },
+                                    error: function () {
+                                        alert("con cac!");
+                                    }
+                                });
+                            });
+                        } else {
+                            alert("Error 1!");
+                        }
+                    } catch (e) {
+                        alert("Error 2!");
+                    }
+                },
+                error: function () {
+                    alert("Error 3!");
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

@@ -23,28 +23,19 @@ public class UploadPublicKeyServlet extends HttpServlet {
             response.getWriter().write("{\"status\":\"error\", \"message\":\"Session expired. Please log in again.\"}");
             return;
         }
+        String code = request.getParameter("code");
+        String message = request.getParameter("verifyCode");
+        if(code != null && message!=null) {
+            if (!code.equals(message)) {
+                response.getWriter().write("{\"status\":\"error\"}");
+                return;
+            } else {
+                response.getWriter().write("{\"status\":\"success\"}");
+                return;
+            }
+        }
         User user = (User) session.getAttribute("auth");
-
-        // Đọc dữ liệu JSON từ request body
-        BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-
-        // Phân tích JSON
-        String requestData = sb.toString();
-        JSONObject jsonObject = new JSONObject(requestData);
-        String publicKey = jsonObject.getString("publicKey");
-
-        // Kiểm tra nếu public key rỗng
-        if (publicKey.isEmpty()) {
-            response.getWriter().write("{\"status\":\"error\", \"message\":\"Public key is empty.\"}");
-            return;
-        }
-
-        // Lưu public key vào cơ sở dữ liệu
+        String publicKey = request.getParameter("fileInput");
         String ip = request.getRemoteAddr();
         try {
             UserService.getInstance().savePublicKeyOnLost(user, publicKey, ip, "/user/uploadPublicKey");
