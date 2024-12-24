@@ -933,11 +933,13 @@
 </script>
 <script>
     var context = "${pageContext.request.contextPath}";
+    var isSendEmailClicked = false; // Biến trạng thái theo dõi nút sendEmail
 
     $(document).ready(function () {
         // Sự kiện cho nút sendEmail
         $('#sendEmail').click(function (event) {
             event.preventDefault();
+            isSendEmailClicked = true; // Đặt trạng thái thành true khi sendEmail được nhấn
             var action = $('#emailAction').val();
             console.log("Action:", action);
 
@@ -955,6 +957,7 @@
                             // Gắn sự kiện cho nút uploadButton một lần
                             $('#uploadButton').off('click').on('click', function (event) {
                                 event.preventDefault();
+
                                 var code1 = $('#verifyCode').val(); // Lấy giá trị verifyCode
                                 var code2 = result.code; // Lấy giá trị code từ kết quả AJAX
                                 if (!code1 || code1.trim() === "") {
@@ -988,7 +991,7 @@
                                         }
                                     },
                                     error: function () {
-                                        alert("con cac!");
+                                        alert("Error 3!");
                                     }
                                 });
                             });
@@ -1003,6 +1006,15 @@
                     alert("Error 3!");
                 }
             });
+        });
+
+        // Sự kiện cho nút uploadButton (kiểm tra nếu sendEmail chưa nhấn)
+        $('#uploadButton').click(function (event) {
+            event.preventDefault();
+            if (!isSendEmailClicked) {
+                alert("Vui lòng nhấn nút 'Gửi email' trước khi thực hiện bước này.");
+                return; // Dừng thực thi nếu sendEmail chưa nhấn
+            }
         });
     });
 </script>
