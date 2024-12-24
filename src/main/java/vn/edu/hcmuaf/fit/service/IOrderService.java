@@ -45,5 +45,5 @@ public interface IOrderService {
 
     Order hasDatePayment(Order order);
 
-    boolean saveSignature(Order order, String signature, String ip, String address);
+    boolean saveSignature(Order order, String signature, String hash, String ip, String address);
 }

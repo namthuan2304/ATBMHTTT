@@ -4,7 +4,6 @@ import vn.edu.hcmuaf.fit.dao.impl.*;
 import vn.edu.hcmuaf.fit.model.*;
 import vn.edu.hcmuaf.fit.service.IOrderService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,13 +118,13 @@ public class OrderService extends LogDAO<Order> implements IOrderService {
     }
 
     @Override
-    public boolean saveSignature(Order order, String signature, String ip, String address) {
+    public boolean saveSignature(Order order, String signature, String hash, String ip, String address) {
         try {
             // Lưu trạng thái trước khi thực hiện cập nhật
             order.setBeforeData("User with ID=" + order.getId() + " has no public key or existing key is being replaced.");
 
             // Thực hiện lưu chữ ký
-            boolean success = OrderDAO.getInstance().saveSignature(order.getId(), signature);
+            boolean success = OrderDAO.getInstance().saveSignature(order.getId(), signature, hash);
 
             // Ghi nhận trạng thái sau khi thực hiện
             if (success) {

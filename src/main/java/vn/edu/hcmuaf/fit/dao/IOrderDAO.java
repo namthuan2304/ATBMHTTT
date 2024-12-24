@@ -3,7 +3,6 @@ package vn.edu.hcmuaf.fit.dao;
 import vn.edu.hcmuaf.fit.model.Order;
 import vn.edu.hcmuaf.fit.model.OrderItem;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +47,8 @@ public interface IOrderDAO extends GenericDAO<Order> {
 
     Map<Order, List<OrderItem>> loadLatestOrderByUser(Integer userId);
 
-    boolean saveSignature(int order_id, String signature);
+    boolean saveSignature(int order_id, String signature, String hash);
+
+
 
 }

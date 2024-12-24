@@ -111,7 +111,7 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
         String sql = "UPDATE orders SET status_id = ?, date_created= ? WHERE id = ?";
         Order order = new Order();
         order.setId(orderId);
-        return update(sql, statusId,this.getOrderStatus(order).getDateCreated(), orderId);
+        return update(sql, statusId, this.getOrderStatus(order).getDateCreated(), orderId);
     }
 
     @Override
@@ -159,14 +159,16 @@ public class OrderDAO extends AbsDAO<Order> implements IOrderDAO {
     }
 
     @Override
-    public boolean saveSignature(int order_id, String signature) {
+    public boolean saveSignature(int order_id, String signature, String hash) {
         // SQL query to update the public_key and keyCreatedDate for the user in the 'users' table
-        String sql = "UPDATE orders SET signature = ?, date_created = ? WHERE id = ? ";
+        String sql = "UPDATE orders SET signature = ?, hash= ?, date_created = ? WHERE id = ? ";
         // Execute the update and return the result
         Order order = new Order();
         order.setId(order_id);
-        return update(sql, signature, this.getOrderStatus(order).getDateCreated(),order_id);
+        return update(sql, signature, hash, this.getOrderStatus(order).getDateCreated(), order_id);
     }
+
+
 
 
 

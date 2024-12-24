@@ -4,10 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
-import vn.edu.hcmuaf.fit.model.Hash;
-import vn.edu.hcmuaf.fit.model.Order;
-import vn.edu.hcmuaf.fit.model.OrderItem;
-import vn.edu.hcmuaf.fit.model.User;
+import vn.edu.hcmuaf.fit.model.*;
 import vn.edu.hcmuaf.fit.service.impl.*;
 
 import java.lang.reflect.Field;
@@ -119,7 +116,13 @@ public class OrderApprovalScheduler implements ServletContextListener {
                 Hash hash = new Hash();
                 String hashOrder = null;
                 hashOrder = hash.hash(root.toString());
-                System.out.println(hashOrder);
+                if(order.getHash() == null || !hashOrder.equals(order.getHash())) {
+                    OrderStatus status = new OrderStatus();
+                    status.setId(5);
+                    order.setStatus(status);
+                    boolean success = OrderService.getInstance().updateOrderStatus(order, "127.0.0.1", "admin/approve_order");
+                    System.out.println(success);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -8,10 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import vn.edu.hcmuaf.fit.dao.impl.DeliveryDAO;
-import vn.edu.hcmuaf.fit.dao.impl.DiscountDAO;
 import vn.edu.hcmuaf.fit.dao.impl.OrderDAO;
-import vn.edu.hcmuaf.fit.dao.impl.ProductDAO;
 import vn.edu.hcmuaf.fit.model.*;
 import vn.edu.hcmuaf.fit.service.impl.DeliveryService;
 import vn.edu.hcmuaf.fit.service.impl.DiscountService;
@@ -21,7 +18,6 @@ import vn.edu.hcmuaf.fit.service.impl.ProductService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.util.List;
 import java.util.Map;
@@ -214,7 +210,7 @@ public class UserSign extends HttpServlet {
                             hashOrder = hash.hash(root.toString());
                             request.setAttribute("hash", hashOrder);
                             if (verifySign.verify(sign, publicKey, hashOrder)) {
-                                boolean rs = OrderService.getInstance().saveSignature(order, sign, ip, "user/sign");
+                                boolean rs = OrderService.getInstance().saveSignature(order, sign, hashOrder, ip, "user/sign");
                                 OrderStatus orderStatus = new OrderStatus();
                                 orderStatus.setId(1);
                                 order.setStatus(orderStatus);

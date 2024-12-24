@@ -32,6 +32,8 @@ public class Order extends AbsModel implements Serializable {
      OrderStatus status;
      @Nested("admin")
      User admin;
+     String signature;
+     String hash;
 
     @Nested("user")
     public User getUser() {
