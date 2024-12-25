@@ -483,7 +483,7 @@ public class UserService extends LogDAO<User> implements IUserService {
         }
     }
     @Override
-    public boolean savePublicKeyOnLost(User user, String publicKey, String ip, String address) {
+    public boolean reportLostKey(User user, String ip, String address) {
         try {
             LocalDateTime now = LocalDateTime.now();
 
@@ -491,7 +491,7 @@ public class UserService extends LogDAO<User> implements IUserService {
             user.setBeforeData("User with ID=" + user.getId() + " is reporting key loss. Public key is being replaced.");
 
               // Lưu khóa công khai mới vào cơ sở dữ liệu
-            boolean success = UserDAO.getInstance().savePublicKeyOnLost(user.getId(), publicKey);
+            boolean success = UserDAO.getInstance().reportLostKey(user.getId());
 
             // Ghi nhận trạng thái sau khi thực hiện
             if (success) {

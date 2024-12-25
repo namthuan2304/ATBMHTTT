@@ -46,6 +46,6 @@ public interface IUserService {
 
     boolean savePublicKey(User user, String publicKey, String ip, String address);
 
-    boolean savePublicKeyOnLost(User user, String publicKey, String ip, String address);
+    boolean reportLostKey(User user, String ip, String address);
 
 }

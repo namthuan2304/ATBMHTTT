@@ -30,9 +30,8 @@ public class GenerateKeyLost extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=UTF-8");
-//        HttpSession session = request.getSession(true);
 
-        // test xem neu gửi ve mail khác localhost thi co bị expired khong?
+        // Kiểm tra session người dùng
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("auth") == null) {
             response.getWriter().write("{\"status\":\"error\", \"message\":\"Session expired. Please log in again.\"}");
@@ -42,40 +41,46 @@ public class GenerateKeyLost extends HttpServlet {
         User user = (User) session.getAttribute("auth");
 
         try {
-            // Tạo cặp khóa RSA mới khi người dùng báo mất khóa
+            // Tạo cặp khóa RSA
             RSAKeyGeneratorImpl rsaKeyGenerator = new RSAKeyGeneratorImpl();
             KeyPair keyPair = rsaKeyGenerator.generateKeyPair();
             PublicKey publicKey = keyPair.getPublic();
             PrivateKey privateKey = keyPair.getPrivate();
 
             String publicKeyBase64 = rsaKeyGenerator.encodePublicKey(publicKey);
-            String privateKeyBase64 = rsaKeyGenerator.encodePrivateKey(privateKey);  // privateKeyBase64 là base64 không cần giải mã
+            String privateKeyBase64 = rsaKeyGenerator.encodePrivateKey(privateKey);
 
-            // Lưu thông tin public key vào cơ sở dữ liệu
+            // Lấy IP của người dùng
             String ip = request.getRemoteAddr();
-            UserService.getInstance().savePublicKeyOnLost(user, publicKeyBase64, ip, "/user/generateKeyLost");
+
+
+            // Kiểm tra các thông tin về liên kết khóa
             String linkKey = (String) session.getAttribute("linkKey");
             Long linkKeyExpiry = (Long) session.getAttribute("linkKeyExpiry");
 
-            // Cập nhật public key vào session và cơ sở dữ liệu
-            user.setPublicKey(publicKeyBase64);
-            session.setAttribute("auth", user);
-
-            // Kiểm tra nếu yêu cầu tải private key
+            // Kiểm tra yêu cầu tải xuống khóa riêng tư
             String download = request.getParameter("download");
             if (linkKey != null && linkKeyExpiry != null && System.currentTimeMillis() <= linkKeyExpiry) {
                 if ("true".equalsIgnoreCase(download)) {
-                    // Nếu yêu cầu tải private key, trả về private key dưới dạng base64
+                    // Lưu khóa công khai vào cơ sở dữ liệu khi người dùng tải xuống khóa riêng tư
+                    UserService.getInstance().savePublicKey(user, publicKeyBase64, ip, "/user/generateKeyLost");
+
+                    // Cập nhật khóa công khai vào session
+                    user.setPublicKey(publicKeyBase64);
+                    session.setAttribute("auth", user);
+
+                    // Gửi private key
                     sendPrivateKey(response, privateKeyBase64, user.getEmail());
-                    return;  // Dừng xử lý thêm, vì file đã được gửi về
+                    return; // Dừng xử lý sau khi gửi file
                 }
-            }else {
-                // Link hết hạn
+            } else {
+                // Liên kết đã hết hạn hoặc không hợp lệ
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Link đã hết hạn hoặc không hợp lệ.");
                 session.removeAttribute("linkKey");
                 session.removeAttribute("linkKeyExpiry");
             }
-            // Trả về thông báo thành công
+
+            // Phản hồi thành công nếu không có yêu cầu tải xuống
             response.getWriter().write("{\"status\":\"success\", \"message\":\"Keys generated successfully.\"}");
 
         } catch (Exception e) {
@@ -84,22 +89,21 @@ public class GenerateKeyLost extends HttpServlet {
         }
     }
 
-
     public void sendPrivateKey(HttpServletResponse response, String privateKeyBase64, String userEmail) throws IOException {
-        // Cấu hình phản hồi HTTP để gửi private key dưới dạng văn bản (base64)
-        response.setContentType("text/plain; charset=UTF-8");  // Đảm bảo kiểu dữ liệu là văn bản
+        // Cấu hình phản hồi HTTP để gửi private key
+        response.setContentType("text/plain; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        // Tên file private key sẽ gửi cho người dùng
+        // Tên file private key
         String fileName = userEmail + "_private_key.pem";
 
-        // Thiết lập headers để tải file về
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");  // Đặt tên file tải về
+        // Đặt headers cho file download
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
 
-        // Gửi private key dưới dạng base64 (không cần giải mã)
+        // Gửi private key dưới dạng base64
         try (ServletOutputStream outputStream = response.getOutputStream()) {
-            outputStream.write(privateKeyBase64.getBytes("UTF-8"));  // Ghi khóa vào output stream (dưới dạng base64)
-            outputStream.flush();  // Đảm bảo tất cả dữ liệu đã được gửi đi
+            outputStream.write(privateKeyBase64.getBytes("UTF-8"));
+            outputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();
             response.getWriter().write("{\"status\":\"error\", \"message\":\"Error while downloading private key.\"}");
