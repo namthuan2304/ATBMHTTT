@@ -220,7 +220,7 @@
                         <a href="" data-target="#favourite" data-toggle="tab" class="nav-link nav-link-2">Sản phẩm yêu thích</a>
                     </li>
                     <li class="nav-item">
-                        <a href="" data-target="#createKeyPair" data-toggle="tab" class="nav-link nav-link-2">Tạo cặp khóa mới</a>
+                        <a href="" data-target="#createKeyPair" data-toggle="tab" class="nav-link nav-link-2">Báo cáo mất key</a>
                     </li>
 
                 </ul>
@@ -524,18 +524,16 @@
         %>
     </div>
 </div>
-                    <!-- Tab "Tạo Cặp Khóa Mới" -->
                     <div class="tab-pane text-center" id="createKeyPair">
                         <header>
-                            <h1>Tạo Cặp Khóa Mới</h1>
-                            <div class="content">Tạo một cặp khóa mới để bảo mật tài khoản của bạn.</div>
+                            <h1>Báo cáo mất key</h1>
+                            <div class="content">Báo cáo mất key và tạo khóa mới</div>
                         </header>
 
-                        <!-- Nút Tạo Cặp Khóa Mới -->
                         <div id="createKeyPairButton" class="voltage-button">
                             <form>
                                 <input type="hidden" value="change" id="keyAction">
-                                <button id="btnKey" type="button">Tạo Cặp Khóa Mới</button>
+                                <button id="btnKey" type="button">Báo cáo</button>
                             </form>
                             <svg width="10px" height="10px">
                                 <path d="M1,5 L5,9 L9,5"></path>
@@ -826,7 +824,7 @@
                 success: function (result) {
                     try {
                         if (result.status === "success") {
-                            alert("Link xác thực tạo khoá mới đã được gửi về mail của bạn!")
+                            alert("Báo cáo mất key thành công. Link xác thực tạo khoá mới đã được gửi về mail của bạn!")
                         } else {
                             alert("Error 1!")
                         }

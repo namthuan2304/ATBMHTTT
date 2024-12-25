@@ -1,9 +1,10 @@
+<%@ include file="/WEB-INF/user/include/header.jsp" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generate Key</title>
+    <title>Tạo khóa</title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
         body {
@@ -249,8 +250,8 @@
 </head>
 <body>
 <div class="container">
-    <h1>Create Your RSA Key Pair</h1>
-    <p>Click the button below to generate your RSA key pair. The public key will be stored securely on the server, while you will be able to download your private key and tools together in a zip file. Ensure you keep your private key safe!</p>
+    <h1>Tạo Cặp Khóa RSA</h1>
+    <p>Nhấn vào nút bên dưới để tạo cặp khóa RSA. Khóa công khai sẽ được lưu an toàn trên máy chủ, còn khóa riêng tư sẽ được tải về dưới dạng tập tin nén. Hãy giữ khóa riêng tư của bạn an toàn!</p>
 <div style="display: flex;justify-content: center">
     <button id="generateKeyButton" class="button">
         <div class="dots_border"></div>
@@ -285,7 +286,7 @@
                     d="M6.5 4L6.303 4.5915C6.24777 4.75718 6.15472 4.90774 6.03123 5.03123C5.90774 5.15472 5.75718 5.24777 5.5915 5.303L5 5.5L5.5915 5.697C5.75718 5.75223 5.90774 5.84528 6.03123 5.96877C6.15472 6.09226 6.24777 6.24282 6.303 6.4085L6.5 7L6.697 6.4085C6.75223 6.24282 6.84528 6.09226 6.96877 5.96877C7.09226 5.84528 7.24282 5.75223 7.4085 5.697L8 5.5L7.4085 5.303C7.24282 5.24777 7.09226 5.15472 6.96877 5.03123C6.84528 4.90774 6.75223 4.75718 6.697 4.5915L6.5 4Z"
             ></path>
         </svg>
-        <span class="text_button">Generate Key</span>
+        <span class="text_button">Tạo khóa</span>
     </button>
 
 </div>
@@ -357,4 +358,5 @@
     });
 </script>
 </body>
+<%@ include file="/WEB-INF/user/include/footer.jsp" %>
 </html>

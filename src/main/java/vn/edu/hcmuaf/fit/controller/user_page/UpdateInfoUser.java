@@ -169,6 +169,8 @@ public class UpdateInfoUser extends HttpServlet {
             }
         } else if (action.equals("change")) {
             SendEmail sendEmail = new SendEmail();
+            // Gọi reportLostKey để lưu thông tin báo mất khóa
+            UserService.getInstance().reportLostKey(user, ip, "/user/generateKeyLost");
             String link = "http://localhost:8080/user/generateKeyLost?download=true";
             if (sendEmail.sendLinkKey(user.getEmail(), link)) {
                 session.setAttribute("linkKey", link);

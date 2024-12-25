@@ -43,5 +43,5 @@ public interface IUserDAO extends GenericDAO<User> {
     boolean updateAvatar(Integer id, String avatar);
 
     boolean savePublicKey(Integer userId, String publicKey);
-    boolean savePublicKeyOnLost(Integer userId, String publicKey);
+    boolean reportLostKey(Integer userId);
 }

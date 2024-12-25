@@ -37,7 +37,7 @@ public class User extends AbsModel implements Serializable {
 
     // Thêm trường để lưu ngày tạo khóa và ngày hết hạn khóa
     Timestamp keyCreatedDate;  // Ngày tạo khóa
-    Timestamp keyEndDate;    // Ngày hết hạn khóa
+    Timestamp oldKeyEndDate;    // Ngày hết hạn khóa
 
     @Nested("role")
     Role role;
