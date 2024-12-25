@@ -31,7 +31,7 @@ public class OrderApprovalScheduler implements ServletContextListener {
         };
 
         // Tính delay và period
-        long delay = calculateDelay(11, 44); // 14:30
+        long delay = calculateDelay(23, 23); // 14:30
         long period = TimeUnit.DAYS.toSeconds(1); // Lặp lại mỗi ngày
 
         // Lên lịch tác vụ
@@ -116,12 +116,14 @@ public class OrderApprovalScheduler implements ServletContextListener {
                 Hash hash = new Hash();
                 String hashOrder = null;
                 hashOrder = hash.hash(root.toString());
-                if(order.getHash() == null || !hashOrder.equals(order.getHash())) {
-                    OrderStatus status = new OrderStatus();
-                    status.setId(5);
-                    order.setStatus(status);
-                    boolean success = OrderService.getInstance().updateOrderStatus(order, "127.0.0.1", "admin/approve_order");
-                    System.out.println(success);
+                if(order.getStatus().getId()!=5) {
+                    if(order.getHash() == null || !hashOrder.equals(order.getHash())) {
+                        OrderStatus status = new OrderStatus();
+                        status.setId(5);
+                        order.setStatus(status);
+                        boolean success = OrderService.getInstance().updateOrderStatus(order, "127.0.0.1", "admin/approve_order");
+                        System.out.println(success);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
